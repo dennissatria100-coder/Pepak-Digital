@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="jv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pepak Digital — Platform Pembelajaran Interaktif Bahasa Jawa Halus & Wayang</title>
+  
+  <!-- Meta & SEO Tags -->
+  <meta name="description" content="Pepak Digital (PepakNusa Wayang Digital) — Media ajar interaktif Bahasa Jawa Krama Alus dengan konsep gamifikasi Duolingo, 500+ kamus kosakata, 300+ bank soal, 20 unit belajar, dan mode flashcard 3D.">
+  <meta name="keywords" content="pepak digital, bahasa jawa, krama alus, wayang, dasanama, gamifikasi, duolingo, kamus jawa, flashcard, baoesastra djawa">
+  <meta name="theme-color" content="#1A0F08">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/duolingo-tree.css">
+  <link rel="stylesheet" href="css/quiz-arena.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pricing-payment.css">
+  <link rel="stylesheet" href="css/expanded-learning.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP PROMO TRIAL STRIP (BANNER 7 HARI GRATIS)
+       ======================================================================== -->
+  <div class="trial-banner-strip" onclick="window.app?.navigateTo('pricing')">
+    <span>✨ <strong>Promo Ksatria Emas:</strong> Coba 7 Hari Gratis Akses Penuh Seluruh 20 Unit, Tokoh Wayang & Nyawa Tanpa Batas!</span>
+    <span class="btn-trial-pill">Coba Gratis 7 Hari ➔</span>
+  </div>
+
+  <!-- ========================================================================
+       TOP NAVIGATION BAR & HUD
+       ======================================================================== -->
+  <header class="top-hud-bar">
+    <div class="hud-container">
+      
+      <!-- Logo PepakNusa -->
+      <a href="#home" class="brand-logo-link" onclick="window.app?.navigateTo('home')">
+        <div class="mask-logo-badge" title="PepakNusa Wayang Topeng">
+          <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 5 C10 5, 5 13, 5 24 C5 33, 12 37, 20 37 C28 37, 35 33, 35 24 C35 13, 30 5, 20 5 Z" fill="url(#maskGrad)" stroke="#D4A64C" stroke-width="1.8"/>
+            <ellipse cx="14" cy="20" rx="3.5" ry="2.2" fill="#3A86FF" stroke="#D4A64C" stroke-width="1"/>
+            <ellipse cx="26" cy="20" rx="3.5" ry="2.2" fill="#E63946" stroke="#D4A64C" stroke-width="1"/>
+            <path d="M20 21 L18.5 27 L21.5 27" stroke="#D4A64C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 30 Q20 34 27 30" stroke="#D4A64C" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <circle cx="5" cy="24" r="1.5" fill="#D4A64C"/>
+            <circle cx="35" cy="24" r="1.5" fill="#D4A64C"/>
+            <defs>
+              <linearGradient id="maskGrad" x1="5" y1="5" x2="35" y2="37" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#4A3018"/>
+                <stop offset="1" stop-color="#22130A"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-text-col">
+          <span class="brand-title">PEPAKNUSA</span>
+          <span class="brand-subtitle">WAYANG DIGITAL</span>
+        </div>
+      </a>
+
+      <!-- Global Search Bar -->
+      <div class="nav-search-wrapper">
+        <span class="search-icon-pos">🔍</span>
+        <input type="text" class="nav-search-input global-character-search" placeholder="Cari tokoh atau kata: Arjuna, Semar, Dahar..." />
+      </div>
+
+      <!-- Duolingo HUD Stats (Keris Hearts, Streak, XP) -->
+      <div class="hud-stats-group">
+        <div class="hud-pill hearts" title="Nyawa Keris (Hearts)">
+          <span>🗡️</span>
+          <span class="hud-hearts-val">5/5</span>
+        </div>
+        <div class="hud-pill streak" title="Streak Belajar Harian">
+          <span>🔥</span>
+          <span class="hud-streak-val">3 Dina</span>
+        </div>
+        <div class="hud-pill xp" title="Total Poin XP">
+          <span>⚡</span>
+          <span class="hud-xp-val">450 XP</span>
+        </div>
+      </div>
+
+      <!-- Mobile Backdrop Overlay -->
+      <div class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
+
+      <!-- Main Navigation Menu (Slide-out drawer on Mobile, Inline on Desktop) -->
+      <nav class="nav-actions-menu" id="main-nav-links-menu">
+        
+        <!-- Mobile Drawer Header -->
+        <div class="mobile-drawer-header">
+          <div class="drawer-brand-wrap">
+            <span class="drawer-logo-icon">🎭</span>
+            <span class="drawer-title">PEPAK DIGITAL</span>
+          </div>
+          <button class="mobile-drawer-close-btn" id="mobile-drawer-close-btn" aria-label="Tutup Menu">✕</button>
+        </div>
+
+        <!-- Mobile Drawer Search Bar -->
+        <div class="mobile-drawer-search">
+          <span class="search-icon-pos">🔍</span>
+          <input type="text" class="nav-search-input global-character-search" placeholder="Cari tokoh / kata: Arjuna, Dahar..." />
+        </div>
+
+        <!-- Links Scroll Area -->
+        <div class="drawer-links-scroll">
+          <button class="nav-link-btn active" data-view="home" onclick="window.app?.navigateTo('home')">
+            <span>🏛️</span> Beranda
+          </button>
+          <button class="nav-link-btn" data-view="characters" onclick="window.app?.navigateTo('characters')">
+            <span>👤</span> Tokoh Wayang
+          </button>
+          <button class="nav-link-btn" data-view="pepak" onclick="window.app?.navigateTo('pepak')">
+            <span>📖</span> 20 Unit Belajar
+          </button>
+          <button class="nav-link-btn" data-view="dictionary" onclick="window.app?.navigateTo('dictionary')">
+            <span>📚</span> Kamus 500+
+          </button>
+          <button class="nav-link-btn" data-view="arena" onclick="window.app?.navigateTo('arena')">
+            <span>⚔️</span> Arena Praktik
+          </button>
+          <button class="nav-link-btn" data-view="pricing" onclick="window.app?.navigateTo('pricing')" style="color:var(--gold-primary); font-weight:800;">
+            <span>👑</span> Paket Langganan
+          </button>
+          <button class="nav-link-btn" data-view="teacher" onclick="window.app?.navigateTo('teacher')">
+            <span>👨‍🏫</span> Kemitraan Sekolah
+          </button>
+          <button class="nav-link-btn" data-view="leaderboard" onclick="window.app?.navigateTo('leaderboard')">
+            <span>🏆</span> Papan Peringkat
+          </button>
+          <button class="nav-link-btn" data-view="profile" onclick="window.app?.navigateTo('profile')">
+            <span>⚙️</span> Profil & Akun
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="mobile-toggle-btn" id="mobile-menu-toggle-btn" aria-label="Buka Menu">
+        <span>☰</span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       VIEW 1: LANDING PAGE (BERANDA)
+       ======================================================================== -->
+  <main id="view-home" class="spa-view-section active-view">
+    
+    <!-- Hero Section -->
+    <section class="hero-landing-section">
+      
+      <!-- Watermark Topeng Wayang Transparan Sisi Kanan -->
+      <div class="hero-watermark-right">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 20 C40 20, 20 60, 20 115 C20 170, 55 190, 100 190 C145 190, 180 170, 180 115 C180 60, 160 20, 100 20 Z" fill="#D4A64C" opacity="0.8"/>
+          <ellipse cx="65" cy="100" rx="18" ry="12" fill="#0D0704"/>
+          <ellipse cx="135" cy="100" rx="18" ry="12" fill="#0D0704"/>
+          <path d="M100 105 L92 135 L108 135" stroke="#0D0704" stroke-width="8" stroke-linecap="round"/>
+          <path d="M65 155 Q100 175 135 155" stroke="#0D0704" stroke-width="8" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- Watermark Wayang Kiri -->
+      <div class="hero-watermark-left">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="90" stroke="#D4A64C" stroke-width="3" stroke-dasharray="8 6"/>
+          <path d="M100 30 L120 70 L160 70 L130 100 L140 140 L100 115 L60 140 L70 100 L40 70 L80 70 Z" fill="#D4A64C" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <!-- Badge Kurikulum -->
+      <div class="hero-badge-pill">
+        <span>🏛</span> MEDIA AJAR INTERAKTIF • KURIKULUM KEBUDAYAAN
+      </div>
+
+      <!-- Big Main Title (2 Baris) -->
+      <h1 class="hero-main-title">
+        <span class="hero-title-gold">PEPAK DIGITAL</span>
+        <span class="hero-title-cream">INTERAKTIF</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <h2 class="hero-subtitle">Modul Wayang & Kebudayaan Jawa</h2>
+
+      <!-- Description -->
+      <p class="hero-description">
+        Kenali tokoh-tokoh wayang, pelajari sifat & peran mereka, dengarkan karakter suara,
+        lalu uji pemahaman di Arena Praktik. Untuk <strong>guru</strong> dan <strong>siswa</strong> — seru, ringan, dan mudah.
+      </p>
+
+      <!-- 2 CTA Buttons -->
+      <div class="hero-cta-buttons">
+        <button class="btn-gold-action btn-large" onclick="window.app?.navigateTo('characters')">
+          <span>👤</span> Jelajahi Tokoh Wayang
+        </button>
+        <button class="btn-outline-gold btn-large" onclick="window.app?.navigateTo('pepak')">
+          <span>📖</span> Buka 20 Unit Belajar
+        </button>
+      </div>
+
+      <!-- 4 STATS CARDS SEJAJAR -->
+      <div class="hero-stats-grid">
+        <div class="stat-metric-card" onclick="window.app?.navigateTo('characters')">
+          <span class="stat-num-gold">12+</span>
+          <span class="stat-label-muted">Total Tokoh</span>
+        </div>
+        <div class="stat-metric-card" onclick="window.app?.navigateTo('dictionary')">
+          <span class="stat-num-gold">520+</span>
+          <span class="stat-label-muted">Kamus Kosakata</span>
+        </div>
+        <div class="stat-metric-card" onclick="window.app?.navigateTo('arena')">
+          <span class="stat-num-gold">320+</span>
+          <span class="stat-label-muted">Bank Soal Kuis</span>
+        </div>
+        <div class="stat-metric-card" onclick="window.app?.navigateTo('pepak')">
+          <span class="stat-num-gold">20</span>
+          <span class="stat-label-muted">Unit Piwulang</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- WIDGET: TEMBUNG DINA IKI (KATA HARI INI) -->
+    <div id="word-of-the-day-container">
+      <!-- Rendered by dictionary.js -->
+    </div>
+
+    <!-- SECTION: ALUR PEMBELAJARAN 3 TAHAP -->
+    <section class="learning-flow-section">
+      <div class="section-header-center">
+        <h2 class="section-main-title">ALUR PEMBELAJARAN 3 TAHAP</h2>
+        <p class="section-sub-desc">Klik kartu tokoh mana saja untuk memulai perjalanan belajar</p>
+      </div>
+
+      <div class="flow-cards-grid">
+        
+        <!-- Tahap 1 -->
+        <div class="flow-step-card" onclick="window.app?.navigateTo('characters')">
+          <span class="flow-step-num">01</span>
+          <span class="flow-icon-box">🎭</span>
+          <h3 class="flow-step-title">1. Kenali Watak Tokoh</h3>
+          <p class="flow-step-desc">
+            Eksplorasi watak luhur, kasatriyan, ajian pusaka, silsilah, lan data dasanama (sinonim) para tokoh Pandawa & Punakawan.
+          </p>
+          <div class="flow-card-link">
+            <span>Eksplorasi Tokoh</span> ➔
+          </div>
+        </div>
+
+        <!-- Tahap 2 -->
+        <div class="flow-step-card" onclick="window.app?.navigateTo('pepak')">
+          <span class="flow-step-num">02</span>
+          <span class="flow-icon-box">📜</span>
+          <h3 class="flow-step-title">2. Pelajari Unggah-Ungguh</h3>
+          <p class="flow-step-desc">
+            Sinau kosakata Ngoko, Krama Madya, lan Krama Inggil lumantar 20 unit piwulang bertingkat kaya Duolingo.
+          </p>
+          <div class="flow-card-link">
+            <span>Buka Modul Belajar</span> ➔
+          </div>
+        </div>
+
+        <!-- Tahap 3 -->
+        <div class="flow-step-card" onclick="window.quizEngine?.startPracticeArena()">
+          <span class="flow-step-num">03</span>
+          <span class="flow-icon-box">⚔️</span>
+          <h3 class="flow-step-title">3. Praktikkan di Arena</h3>
+          <p class="flow-step-desc">
+            Uji kaprigelan liwat 320+ kuis interaktif 8 tipe soal, uji rungon audio, susun ukara, lan review harian.
+          </p>
+          <div class="flow-card-link">
+            <span>Mlebu Arena Kuis</span> ➔
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Daily Quote Widget (Pituduh Luhur) -->
+      <div class="daily-quote-widget">
+        <div class="quote-icon-col">🪶</div>
+        <div class="quote-content-col">
+          <div class="quote-label-tag">Pituduh Luhur Basa Krama Alus Harian</div>
+          <p class="quote-jawa-text">"Urip iku urup, tansah migunani tumrap sapadha-padha."</p>
+          <p class="quote-indo-arti"><em>Artinya:</em> Hidup itu harus menyala memberi penerangan dan manfaat bagi sesama makhluk ciptaan-Nya.</p>
+        </div>
+        <button class="audio-speak-btn" onclick="window.audioEngine?.speakText('Urip iku urup, tansah migunani tumrap sapadha-padha.')" title="Dengarkan Pengucapan">
+          <span>🔊</span> Putar Suara
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       VIEW 2: KATALOG TOKOH WAYANG & DASANAMA
+       ======================================================================== -->
+  <section id="view-characters" class="spa-view-section">
+    <div class="characters-catalog-page">
+      
+      <div class="catalog-header-zone">
+        <h2 class="catalog-main-title">Ensiklopedia Tokoh Wayang</h2>
+        <p class="catalog-sub-desc">
+          Kenali watak, pusaka sakti, silsilah kasatriyan, data dasanama sastra Jawa, lan piwulang luhur saben paraga wayang.
+        </p>
+
+        <!-- Kategori Filter Tabs -->
+        <div class="catalog-filter-bar">
+          <button class="character-filter-tab active" data-category="all">Sedaya (Semua Tokoh)</button>
+          <button class="character-filter-tab" data-category="pandawa">Pandawa Lima</button>
+          <button class="character-filter-tab" data-category="punakawan">Punakawan</button>
+          <button class="character-filter-tab" data-category="ksatria">Ksatria & Prajurit</button>
+        </div>
+      </div>
+
+      <!-- Characters Grid Container -->
+      <div class="characters-grid" id="characters-grid-container">
+        <!-- Dynamic Cards -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 3: MODUL BELAJAR JALUR DUOLINGO (20 UNIT PEPAK DIGITAL)
+       ======================================================================== -->
+  <section id="view-pepak" class="spa-view-section">
+    <div class="duolingo-page-layout">
+      
+      <div class="duo-page-header">
+        <h2 class="duo-page-title">Peta Piwulang 20 Unit Kasatriyan</h2>
+        <p class="duo-page-sub">Rampungake saben unit piwulang saka Kasatriyan Dhasar nganti Maharesi Basa Jawa.</p>
+      </div>
+
+      <!-- Duolingo Skill Tree Path Container -->
+      <div id="duolingo-path-container">
+        <!-- Rendered by app.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 4: KAMUS PEPAK 500+ KOSAKATA & FLASHCARDS 3D
+       ======================================================================== -->
+  <section id="view-dictionary" class="spa-view-section">
+    <div class="dict-page-layout">
+      
+      <div class="duo-page-header">
+        <h2 class="duo-page-title">Kamus Pepak Basa Jawa (500+ Kosakata)</h2>
+        <p class="duo-page-sub">Adhedhasar Baoesastra Djawa & Kurikulum Muatan Lokal Jawa. Dilengkapi audio pengucapan lan flashcard 3D.</p>
+      </div>
+
+      <!-- Mode Tampilan Switcher (Tabel, Kartu Grid, Flashcard 3D) -->
+      <div class="dict-view-modes-bar">
+        <div class="dict-modes-group">
+          <button class="dict-mode-btn active" data-mode="table">📋 Mode Tabel</button>
+          <button class="dict-mode-btn" data-mode="cards">🃏 Kartu Tematik</button>
+          <button class="dict-mode-btn" data-mode="flashcards">🗂️ Flashcard 3D</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:0.8rem;">
+          <select class="dict-select-filter" id="dictionary-level-select" style="padding:0.45rem 1rem;">
+            <option value="all">Semua Tingkat Level</option>
+            <option value="pemula">Tingkat Pemula</option>
+            <option value="menengah">Tingkat Menengah</option>
+            <option value="mahir">Tingkat Mahir</option>
+          </select>
+          <label style="font-size:0.85rem; display:flex; align-items:center; gap:0.4rem; cursor:pointer; color:var(--gold-primary); font-weight:700;">
+            <input type="checkbox" id="dictionary-fav-only-checkbox" /> ⭐ Hanya Favorit
+          </label>
+        </div>
+      </div>
+
+      <!-- 10 Kategori Tematik Horizontal Scroll -->
+      <div class="dict-filter-tags-scroll" id="dict-category-pills-scroll">
+        <!-- Rendered by dictionary.js -->
+      </div>
+
+      <!-- Search Controls -->
+      <div class="dict-controls-row">
+        <input type="text" class="dict-search-input" id="dictionary-search-input" placeholder="Padosi kosakata: mangan, turu, mustaka, arta, dasanama..." />
+      </div>
+
+      <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.88rem;" id="dictionary-result-count">
+        Memuat data kosakata...
+      </div>
+
+      <!-- 1. TABLE VIEW CONTAINER -->
+      <div class="dict-table-container" id="dict-table-view-container">
+        <table class="dict-table">
+          <thead>
+            <tr>
+              <th style="width:40px;">⭐</th>
+              <th>Basa Ngoko</th>
+              <th>Krama Madya</th>
+              <th>Krama Inggil / Alus</th>
+              <th>Bahasa Indonesia</th>
+              <th>Tuladha Ukara Krama</th>
+            </tr>
+          </thead>
+          <tbody id="pepak-dictionary-table-body">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 2. THEMATIC CARDS GRID CONTAINER -->
+      <div id="dict-cards-view-container" style="display:none;">
+        <!-- Rendered by dictionary.js -->
+      </div>
+
+      <!-- 3. 3D FLASHCARD CONTAINER -->
+      <div id="dict-flashcards-view-container" style="display:none;">
+        <!-- Rendered by dictionary.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 5: ARENA PRAKTIK KUIS & SPACED REPETITION
+       ======================================================================== -->
+  <section id="view-arena" class="spa-view-section">
+    <div class="quiz-arena-layout">
+      
+      <!-- Arena Mode Selector Bar -->
+      <div style="display:flex; justify-content:center; gap:0.8rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+        <button class="btn-outline-gold" onclick="window.quizEngine.startPracticeArena()">
+          🎲 Latihan Acak (320+ Soal)
+        </button>
+        <button class="btn-outline-gold" style="border-color:#FF9E00; color:#FF9E00;" onclick="window.quizEngine.startDailyReviewQuiz()">
+          📅 Review Harian Campuran
+        </button>
+        <button class="btn-outline-gold" style="border-color:#E63946; color:#FF6B6B;" onclick="window.quizEngine.startSpacedRepetitionQuiz()">
+          🔄 Latihan Soal Sulit (Spaced Repetition)
+        </button>
+      </div>
+
+      <!-- Quiz HUD Top -->
+      <div class="quiz-top-hud">
+        <button class="quiz-exit-btn" onclick="window.app?.navigateTo('pepak')" title="Tutup Arena">✕</button>
+        
+        <div class="quiz-progress-track">
+          <div class="quiz-progress-fill" id="quiz-progress-bar-fill"></div>
+        </div>
+
+        <div class="quiz-hearts-box" title="Nyawa Keris">
+          <span>🗡️</span>
+          <span class="hud-hearts-val">5/5</span>
+        </div>
+      </div>
+
+      <!-- Quiz Card Zone -->
+      <div class="quiz-card-wrapper" id="quiz-card-container">
+        <!-- Dynamic Quiz Question Card -->
+      </div>
+
+      <!-- Instant Feedback Bottom Sheet -->
+      <div class="feedback-sheet hidden" id="quiz-feedback-sheet">
+        <!-- Dynamic feedback -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 6: PAKET HARGA (PRICING PAGE)
+       ======================================================================== -->
+  <section id="view-pricing" class="spa-view-section">
+    <div class="pricing-page-layout">
+      
+      <div class="pricing-header-center">
+        <span class="pricing-super-badge">👑 PEPAK DIGITAL SUPER • AKSES TANPA BATAS</span>
+        <h2 class="pricing-main-title">Pilih Paket Langganan Ksatria</h2>
+        <p class="pricing-sub-desc">
+          Buka 20 unit piwulang, 500+ kamus lengkap, 320+ bank soal, nyawa keris tak terbatas, dan sertifikat digital resmi.
+        </p>
+      </div>
+
+      <div class="pricing-grid-container" id="pricing-plans-grid">
+        <!-- Rendered by payment.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 7: CHECKOUT & PEMBAYARAN (MIDTRANS / XENDIT)
+       ======================================================================== -->
+  <section id="view-checkout" class="spa-view-section">
+    <div class="checkout-page-layout">
+      
+      <div class="section-header-center" style="margin-bottom:2.5rem;">
+        <h2 class="pricing-main-title">Konfirmasi & Pembayaran</h2>
+        <p class="pricing-sub-desc">Selesaikan pesanan langganan Anda melalui payment gateway resmi Indonesia.</p>
+      </div>
+
+      <div class="checkout-grid">
+        
+        <!-- Form Data Pembeli & Metode Pembayaran -->
+        <div class="checkout-panel-card">
+          <h3 class="checkout-title"><span>👤</span> Data Pembeli</h3>
+          
+          <div class="form-group-wrap">
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" class="dict-search-input" id="checkout-input-name" placeholder="Nama Lengkap Siswa / Pembeli" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label class="form-label">Alamat Email (untuk Invoice & Akun)</label>
+            <input type="email" class="dict-search-input" id="checkout-input-email" placeholder="contoh@gmail.com" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label class="form-label">Nomor WhatsApp / HP</label>
+            <input type="tel" class="dict-search-input" id="checkout-input-phone" placeholder="08xxxxxxxxxx" required />
+          </div>
+
+          <h3 class="checkout-title mt-4"><span>💳</span> Metode Pembayaran Lokal</h3>
+          <div id="payment-methods-accordion">
+            <!-- Rendered by payment.js -->
+          </div>
+        </div>
+
+        <!-- Ringkasan Pesanan & Tombol Bayar -->
+        <div class="checkout-panel-card">
+          <h3 class="checkout-title"><span>📋</span> Ringkasan Pesanan</h3>
+          
+          <div class="order-summary-box">
+            <div class="summary-row">
+              <span class="text-muted">Paket Dipilih:</span>
+              <strong id="checkout-plan-name">Ksatria Maharesi (Tahunan)</strong>
+            </div>
+            <div class="summary-row">
+              <span class="text-muted">Harga Paket:</span>
+              <span id="checkout-plan-price">Rp 199.000</span>
+            </div>
+            <div class="summary-row">
+              <span class="text-muted">PPN (11%):</span>
+              <span id="checkout-tax-price">Rp 0 (Termasuk)</span>
+            </div>
+            <div class="summary-row total-row">
+              <strong>Total Bayar:</strong>
+              <strong class="gold-text" id="checkout-total-price">Rp 199.000</strong>
+            </div>
+          </div>
+
+          <button class="btn-gold-action btn-large w-100" id="checkout-submit-pay-btn">
+            <span>🔒</span> Bayar Sekarang & Mulai Belajar
+          </button>
+
+          <p class="text-muted text-center mt-3" style="font-size:0.8rem;">
+            🛡️ Transaksi aman terenkripsi 256-bit SSL via Payment Gateway Indonesia.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 8: DASHBOARD GURU & SEKOLAH (B2B)
+       ======================================================================== -->
+  <section id="view-teacher" class="spa-view-section">
+    <div class="teacher-page-layout" id="teacher-dashboard-container">
+      <!-- Rendered by teacher.js -->
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 9: PAPAN PERINGKAT (LEADERBOARD)
+       ======================================================================== -->
+  <section id="view-leaderboard" class="spa-view-section">
+    <div class="leaderboard-page-layout">
+      
+      <div class="duo-page-header">
+        <h2 class="duo-page-title">Papan Peringkat Ksatria</h2>
+        <p class="duo-page-sub">Liga Mingguan Pembelajar Basa Jawa Krama Alus Teraktif</p>
+      </div>
+
+      <!-- Top 3 Podium Container -->
+      <div class="podium-container" id="leaderboard-podium-container">
+        <!-- Rendered by app.js -->
+      </div>
+
+      <!-- Leaderboard Full Table -->
+      <div class="leaderboard-table-card">
+        <table class="leader-table">
+          <thead>
+            <tr>
+              <th>Peringkat</th>
+              <th>Nama Siswa / Pengguna</th>
+              <th>Streak</th>
+              <th>Total XP</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-rows-container">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       VIEW 10: PROFIL PENGGUNA, SUBSCRIPTION & INVOICES
+       ======================================================================== -->
+  <section id="view-profile" class="spa-view-section">
+    <div class="profile-page-layout">
+      
+      <div class="profile-card-hero">
+        <div class="profile-user-main">
+          <div class="profile-big-avatar">🎭</div>
+          <div>
+            <h2 class="profile-user-name" id="profile-display-name">Siswa Ksatria</h2>
+            <p class="profile-user-role" id="profile-display-role">🎒 Siswa Ksatria Jawa</p>
+            <div class="char-title-tag mt-1" id="profile-display-level">Ksatria Pemula</div>
+          </div>
+        </div>
+
+        <div class="hero-stats-grid" style="grid-template-columns: 1fr 1fr; gap: 0.8rem; margin:0;">
+          <div class="stat-metric-card" style="padding: 1rem;">
+            <span class="stat-num-gold" id="profile-display-xp">450 XP</span>
+            <span class="stat-label-muted">Total Poin</span>
+          </div>
+          <div class="stat-metric-card" style="padding: 1rem;">
+            <span class="stat-num-gold" id="profile-display-streak">3 Dina</span>
+            <span class="stat-label-muted">Streak Sinau</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Berlangganan Card -->
+      <div id="profile-subscription-card" style="margin-bottom: 2rem;">
+        <!-- Rendered by app.js -->
+      </div>
+
+      <!-- Spaced Repetition & Penguasaan Kosakata Box -->
+      <div id="profile-learning-stats-box" style="margin-bottom: 2rem;">
+        <!-- Rendered by app.js -->
+      </div>
+
+      <!-- Riwayat Transaksi & Invoices -->
+      <div class="modal-info-box" style="margin-bottom: 2.5rem;">
+        <h3 class="box-head">🧾 Riwayat Transaksi & Unduh Invoice</h3>
+        <div class="table-responsive mt-3">
+          <table class="leader-table">
+            <thead>
+              <tr>
+                <th>No. Invoice</th>
+                <th>Tanggal</th>
+                <th>Paket Layanan</th>
+                <th>Nominal</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="profile-invoices-tbody">
+              <!-- Rendered by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pengaturan Mode Guru/Siswa & Nyawa -->
+      <div class="modal-info-box" style="margin-bottom: 2.5rem;">
+        <h3 class="box-head">⚙️ Pengaturan Pembelajaran</h3>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+          <button class="btn-outline-gold" onclick="window.pepakState.setRole('siswa'); alert('Mode diowahi dados Siswa Ksatria!');">
+            🎒 Mode Siswa
+          </button>
+          <button class="btn-outline-gold" onclick="window.pepakState.setRole('guru'); window.app.navigateTo('teacher');">
+            👨‍🏫 Mode Guru / Pamong
+          </button>
+          <button class="btn-outline-gold" onclick="window.pepakState.refillHearts(); alert('Nyawa Keris sampun kebak 5/5!');">
+            🗡️ Isi Ulang Nyawa Keris (5/5)
+          </button>
+          <button class="btn-outline-gold" style="border-color:#E63946; color:#E63946;" onclick="if(confirm('Panjenengan yakin badhe ngreset progres sinau?')) { window.pepakState.resetProgress(); alert('Progres kasil direset.'); }">
+            🔄 Reset Progres
+          </button>
+        </div>
+      </div>
+
+      <!-- Koleksi Lencana Prestasi -->
+      <h3 class="duo-page-title" style="font-size: 1.5rem; margin-bottom: 1.2rem;">🏅 Lencana Prestasi Kasatriyan</h3>
+      <div class="profile-badges-grid" id="profile-badges-container">
+        <!-- Rendered by app.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       MODAL 1: RINCIAN TOKOH WAYANG & DASANAMA
+       ======================================================================== -->
+  <div class="modal-backdrop-layer" id="character-detail-modal">
+    <div class="character-modal-window">
+      <button class="modal-close-btn" onclick="window.charactersModule?.closeCharacterModal()">✕</button>
+      <div id="character-modal-content">
+        <!-- Dynamic content filled by characters.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: PAYWALL POPUP (UPGRADE KE PREMIUM)
+       ======================================================================== -->
+  <div class="modal-backdrop-layer" id="paywall-modal">
+    <div class="paywall-modal-window">
+      <button class="modal-close-btn" onclick="window.paymentEngine?.closePaywall()">✕</button>
+      
+      <div class="paywall-lock-glow">🔒</div>
+      <h2 class="paywall-title">Konten Kasatriyan Khusus PRO</h2>
+      <p class="paywall-desc">
+        <strong id="paywall-feature-title">Piwulang Kasatriyan Iki</strong> mbutuhaken langganan Ksatria Emas Premium kangge mbukak sedaya aksese.
+      </p>
+
+      <div class="paywall-benefits-list">
+        <div class="paywall-benefit-item">
+          <span>✓</span>
+          <span>Akses penuh seluruh 20 unit pelajaran Krama Alus</span>
+        </div>
+        <div class="paywall-benefit-item">
+          <span>✓</span>
+          <span>Buka 500+ kamus kosakata, flashcard 3D & 320+ bank soal</span>
+        </div>
+        <div class="paywall-benefit-item">
+          <span>✓</span>
+          <span>Nyawa keris tanpa batas (Unlimited Hearts)</span>
+        </div>
+        <div class="paywall-benefit-item">
+          <span>✓</span>
+          <span>Unduh sertifikat digital kelulusan resmi</span>
+        </div>
+      </div>
+
+      <div class="paywall-actions">
+        <button class="btn-gold-action btn-large" onclick="window.paymentEngine.closePaywall(); window.paymentEngine.startCheckout('yearly');">
+          👑 Coba 7 Hari Gratis / Langganan (Rp 16rb/bln)
+        </button>
+        <button class="btn-outline-gold" onclick="window.paymentEngine.closePaywall(); window.app.navigateTo('pricing');">
+          Lihat Semua Pilihan Paket Harga
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: INSTRUKSI PEMBAYARAN GATEWAY (MIDTRANS/XENDIT SANDBOX)
+       ======================================================================== -->
+  <div class="modal-backdrop-layer" id="payment-gateway-modal">
+    <div class="gateway-modal-window">
+      <button class="modal-close-btn" onclick="document.getElementById('payment-gateway-modal').classList.remove('show');">✕</button>
+      <div id="payment-gateway-modal-body">
+        <!-- Rendered by payment.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4: INVOICE RESMI PRINTABLE
+       ======================================================================== -->
+  <div class="modal-backdrop-layer" id="invoice-detail-modal">
+    <div class="invoice-modal-window">
+      <button class="modal-close-btn" onclick="window.paymentEngine?.closeInvoiceModal()">✕</button>
+      <div id="invoice-modal-content">
+        <!-- Rendered by payment.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SITE FOOTER
+       ======================================================================== -->
+  <footer class="site-footer">
+    <div class="footer-content-wrap">
+      <h3 class="footer-brand">PepakNusa Digital</h3>
+      <p class="footer-tagline">"Memayu Hayuning Bawana, Nguri-uri Basa lan Budaya Jawa"</p>
+      
+      <div class="footer-links">
+        <a href="#home" class="footer-link-item" onclick="window.app?.navigateTo('home')">Beranda</a>
+        <a href="#characters" class="footer-link-item" onclick="window.app?.navigateTo('characters')">Ensiklopedia Tokoh</a>
+        <a href="#pepak" class="footer-link-item" onclick="window.app?.navigateTo('pepak')">20 Unit Duolingo</a>
+        <a href="#dictionary" class="footer-link-item" onclick="window.app?.navigateTo('dictionary')">Kamus 500+</a>
+        <a href="#arena" class="footer-link-item" onclick="window.quizEngine?.startPracticeArena()">Arena Praktik</a>
+        <a href="#pricing" class="footer-link-item" onclick="window.app?.navigateTo('pricing')">Paket Langganan</a>
+        <a href="#teacher" class="footer-link-item" onclick="window.app?.navigateTo('teacher')">Kemitraan Sekolah</a>
+        <a href="#leaderboard" class="footer-link-item" onclick="window.app?.navigateTo('leaderboard')">Papan Peringkat</a>
+      </div>
+
+      <p class="footer-copyright">
+        © 2026 Pepak Digital • Media Pembelajaran Bahasa Jawa & Budaya Wayang Nusantara (Baoesastra Djawa).
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/vocab-data.js"></script>
+  <script src="js/question-bank.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/dictionary.js"></script>
+  <script src="js/payment.js"></script>
+  <script src="js/teacher.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
