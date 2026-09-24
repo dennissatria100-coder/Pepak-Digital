@@ -56,6 +56,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -272,6 +273,10 @@ h1, h2, h3, .serif-font {
 .hud-pill.streak { color: #FF9E00; }
 .hud-pill.xp { color: var(--gold-primary); }
 
+.nav-profile-btn {
+  display: none;
+}
+
 /* Hamburger Toggle Button (Mobile) */
 .mobile-toggle-btn {
   display: flex;
@@ -332,10 +337,12 @@ h1, h2, h3, .serif-font {
   padding: 1.2rem 1rem;
   box-shadow: -15px 0 40px rgba(0, 0, 0, 0.9);
   overflow-y: auto;
+  visibility: hidden;
 }
 
 .nav-actions-menu.open {
   transform: translateX(0);
+  visibility: visible;
 }
 
 .mobile-drawer-header {
@@ -926,6 +933,152 @@ h1, h2, h3, .serif-font {
   }
 }
 
+/* --- MOBILE COMPACT (320px - 600px) --- */
+@media (max-width: 600px) {
+  .top-hud-bar {
+    padding: 0.45rem 0.65rem;
+  }
+
+  .hud-container {
+    gap: 0.45rem;
+  }
+
+  .brand-logo-link {
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .mask-logo-badge {
+    width: 34px;
+    height: 34px;
+  }
+
+  .mask-logo-badge svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .brand-title {
+    font-size: 0.86rem;
+    letter-spacing: 0.7px;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .hud-stats-group {
+    gap: 0.25rem;
+  }
+
+  .hud-pill {
+    width: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    justify-content: center;
+    padding: 0.2rem;
+    font-size: 0.8rem;
+  }
+
+  .hud-pill > span:last-child {
+    display: none;
+  }
+
+  .mobile-toggle-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.15rem;
+  }
+
+  .nav-profile-btn {
+    display: none;
+  }
+
+  .hero-landing-section {
+    padding: 2rem 0.85rem 2.5rem;
+  }
+
+  .hero-badge-pill {
+    max-width: 100%;
+    font-size: 0.66rem;
+    letter-spacing: 0.8px;
+    line-height: 1.4;
+  }
+
+  .hero-main-title {
+    font-size: clamp(1.8rem, 9vw, 2.6rem);
+  }
+
+  .section-main-title,
+  .catalog-main-title,
+  .pricing-main-title {
+    font-size: clamp(1.55rem, 8vw, 2.2rem);
+    line-height: 1.2;
+  }
+
+  .hero-stats-grid {
+    gap: 0.55rem;
+  }
+
+  .stat-metric-card {
+    padding: 0.9rem 0.35rem;
+  }
+
+  .stat-label-muted {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+
+  .learning-flow-section,
+  .characters-catalog-page {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .pricing-page-layout,
+  .checkout-page-layout {
+    margin-top: 1.5rem;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .pricing-header-center {
+    margin-bottom: 2.5rem;
+  }
+
+  .pricing-super-badge {
+    max-width: 100%;
+    font-size: 0.67rem;
+    letter-spacing: 0.8px;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .pricing-sub-desc {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .pricing-grid-container {
+    gap: 1.25rem;
+  }
+
+  .pricing-tier-card,
+  .checkout-panel-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .pricing-tier-card.popular-card {
+    transform: none;
+  }
+
+  .pricing-tier-card.popular-card:hover {
+    transform: translateY(-4px);
+  }
+}
+
 /* --- LAPTOP KECIL (769px - 1024px) --- */
 @media (min-width: 769px) {
   .top-hud-bar {
@@ -958,6 +1111,7 @@ h1, h2, h3, .serif-font {
     gap: 0.4rem;
     padding: 0;
     overflow-y: visible;
+    visibility: visible;
   }
 
   .mobile-drawer-header,
@@ -988,6 +1142,29 @@ h1, h2, h3, .serif-font {
 
   .nav-link-btn.active {
     background: rgba(212, 166, 76, 0.18);
+    border-color: var(--gold-primary);
+  }
+
+  .drawer-links-scroll .nav-link-btn[data-view="profile"] {
+    display: none;
+  }
+
+  .nav-profile-btn {
+    display: inline-flex;
+    width: auto;
+    flex-shrink: 0;
+    background: rgba(42, 27, 16, 0.8);
+    border-color: var(--panel-border);
+    color: var(--text-secondary);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.86rem;
+    min-height: 40px;
+    white-space: nowrap;
+  }
+
+  .nav-profile-btn:hover {
+    color: var(--gold-light);
+    background: rgba(212, 166, 76, 0.16);
     border-color: var(--gold-primary);
   }
 
@@ -1033,5 +1210,28 @@ h1, h2, h3, .serif-font {
 
   .hero-description {
     font-size: 1.05rem;
+  }
+}
+
+/* --- DESKTOP NAV ROW (769px+) --- */
+@media (min-width: 769px) {
+  .hud-container {
+    flex-wrap: wrap;
+  }
+
+  .nav-actions-menu {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+    order: 5;
+    border-top: 1px solid rgba(212, 166, 76, 0.12);
+    padding-top: 0.45rem;
+    margin-top: 0.15rem;
+  }
+
+  .drawer-links-scroll {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }

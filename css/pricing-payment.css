@@ -740,6 +740,10 @@
 }
 
 @media (max-width: 600px) {
+  .pricing-grid-container {
+    grid-template-columns: 1fr;
+  }
+
   .inquiry-form-grid { grid-template-columns: 1fr; }
   .inv-meta-grid { grid-template-columns: 1fr; }
   .trial-banner-strip { flex-direction: column; gap: 0.4rem; }

@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/pricing-payment.css">
   <link rel="stylesheet" href="css/expanded-learning.css">
+  <link rel="stylesheet" href="css/youtube-video.css">
 </head>
 
 <body>
@@ -88,6 +89,12 @@
           <span class="hud-xp-val">450 XP</span>
         </div>
       </div>
+
+      <!-- Desktop Profile Shortcut -->
+      <button class="nav-link-btn nav-profile-btn" data-view="profile"
+        onclick="window.app?.navigateTo('profile')">
+        <span>⚙️</span> Profil & Akun
+      </button>
 
       <!-- Mobile Backdrop Overlay -->
       <div class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
@@ -308,6 +315,327 @@
       </div>
 
     </section>
+
+    <!-- ======================================================================
+         SECTION VIDEO YOUTUBE — 20 VIDEO GRATIS + 30 VIDEO PRO
+         ════════════════════════════════════════════════════════════════════
+         CARA MENGGANTI ID VIDEO:
+           Buka js/app.js lalu cari variabel YT_VIDEOS_FREE (20 video gratis)
+           dan YT_VIDEOS_PRO (30 video berbayar). Ganti field "id" setiap
+           objek dengan ID video YouTube Anda.
+           Contoh ID dari https://www.youtube.com/watch?v=dQw4w9WgXcQ
+           adalah  dQw4w9WgXcQ
+         ====================================================================== -->
+    <section class="yt-video-section" id="yt-video-section" aria-label="Video Pembelajaran Pepak Digital">
+
+      <div class="yt-section-header">
+        <h2 class="yt-section-title">🎬 Video Pembelajaran</h2>
+        <p class="yt-section-subtitle">Tonton video interaktif Bahasa Jawa, Wayang, & Budaya Nusantara langsung di sini</p>
+      </div>
+
+      <!-- TAB SWITCHER: GRATIS / PRO -->
+      <div class="yt-tab-bar" role="tablist">
+        <button class="yt-tab-btn active" id="yt-tab-free" role="tab" aria-selected="true"
+          onclick="ytSwitchTab('free')">
+          <span>▶</span> 20 Video Gratis
+        </button>
+        <button class="yt-tab-btn" id="yt-tab-pro" role="tab" aria-selected="false"
+          onclick="ytSwitchTab('pro')">
+          <span>👑</span> 30 Video PRO
+          <span class="pro-badge-pill">PREMIUM</span>
+        </button>
+      </div>
+
+      <!-- PANEL: 20 VIDEO GRATIS -->
+      <div class="yt-panel" id="yt-panel-free" role="tabpanel">
+
+        <!-- Player utama (klik thumbnail → muat di sini) -->
+        <div class="yt-main-player-wrap" id="yt-main-player-wrap-free">
+          <div class="yt-iframe-wrapper" id="yt-main-iframe-free">
+            <!-- Akan diisi oleh JS saat halaman dimuat -->
+          </div>
+          <div class="yt-now-playing" id="yt-now-playing-free">
+            <span class="yt-np-badge">▶ SEDANG DIPUTAR</span>
+            <span class="yt-np-title" id="yt-np-title-free">Video 1 — Pengenalan Pepak Digital</span>
+            <a class="yt-np-link" id="yt-np-link-free"
+               href="#" target="_blank" rel="noopener noreferrer"
+               style="display:none;" title="Buka video ini di YouTube">
+              ↗ Buka di YouTube
+            </a>
+          </div>
+        </div>
+
+        <!-- Grid 20 thumbnail -->
+        <div class="yt-thumb-grid" id="yt-thumb-grid-free">
+          <!-- Dirender oleh ytInitFree() -->
+        </div>
+      </div>
+
+      <!-- PANEL: 30 VIDEO PRO (terkunci) -->
+      <div class="yt-panel" id="yt-panel-pro" role="tabpanel" style="display:none;">
+
+        <!-- Overlay Paywall -->
+        <div class="yt-pro-overlay" id="yt-pro-overlay">
+          <div class="yt-pro-overlay-inner">
+            <div class="paywall-lock-glow" style="margin:0 auto 1.2rem;">🔒</div>
+            <h3 class="yt-pro-overlay-title">30 Video Eksklusif PRO</h3>
+            <p class="yt-pro-overlay-desc">
+              Akses 30 video lanjutan tentang Krama Inggil, Tokoh Wayang lengkap, Gamelan, Tembang Macapat, dan Seni Budaya Jawa.
+              Tersedia khusus untuk pelanggan Ksatria Emas Premium.
+            </p>
+            <div class="yt-pro-benefits">
+              <div class="paywall-benefit-item"><span>✓</span><span>30 video eksklusif HD tanpa iklan</span></div>
+              <div class="paywall-benefit-item"><span>✓</span><span>Materi Krama Inggil level mahir</span></div>
+              <div class="paywall-benefit-item"><span>✓</span><span>Seri tokoh Wayang lengkap (Pandawa, Kurawa, Punakawan)</span></div>
+              <div class="paywall-benefit-item"><span>✓</span><span>Video tembang macapat & gamelan interaktif</span></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1.5rem;">
+              <button class="btn-gold-action btn-large"
+                onclick="window.paymentEngine?.closePaywall(); window.paymentEngine?.startCheckout('yearly');">
+                👑 Coba 7 Hari Gratis / Langganan
+              </button>
+              <button class="btn-outline-gold"
+                onclick="window.app?.navigateTo('pricing');">
+                Lihat Semua Paket Harga
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid 30 thumbnail (blurred di belakang overlay) -->
+        <div class="yt-thumb-grid yt-thumb-grid-locked" id="yt-thumb-grid-pro">
+          <!-- Dirender oleh ytInitPro() -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Script video YouTube (inline, tanpa library tambahan) -->
+    <script>
+      /* ================================================================
+         DATA VIDEO
+         ════════════════════════════════════════════════════════════════
+         CARA MENGGANTI ID:
+           Ganti nilai "id" setiap objek di bawah dengan ID video YouTube.
+           Contoh: "id": "dQw4w9WgXcQ"
+         ================================================================ */
+
+      /*
+        ════════════════════════════════════════════════════════════════════
+        CARA MENGISI LINK VIDEO YOUTUBE
+        ────────────────────────────────────────────────────────────────────
+        Setiap entri punya 2 field yang perlu diisi:
+
+          "id"  → ID video, diambil dari URL YouTube:
+                  https://www.youtube.com/watch?v= >>>XXXXXXXXXXX<<<
+                  Contoh: "id": "dQw4w9WgXcQ"
+
+          "url" → URL lengkap video (untuk tombol buka di tab baru):
+                  Contoh: "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+        Ganti kedua nilai placeholder di bawah untuk setiap video.
+        ════════════════════════════════════════════════════════════════════
+      */
+
+      /* ── 20 VIDEO GRATIS ─────────────────────────────────────────── */
+      var YT_VIDEOS_FREE = [
+        { id: "zCNwNI8Q8Dg", url: "https://youtu.be/zCNwNI8Q8Dg?si=y4JU9C80k5JHDBP9",  title: "BELAJAR BAHASA JAWA PEMULA",            num: 1,  icon: "🎭" },
+        { id: "B49Sz66U8dU", url: "https://youtu.be/B49Sz66U8dU?si=G5ck5YNMo0FaKwHQ",  title: "Basa Ngoko vs Krama — Perbedaan",       num: 2,  icon: "📖" },
+        { id: "HNsEUIuo8HE", url: "https://youtu.be/HNsEUIuo8HE?si=OxyJ-GsbyBjswfvK",  title: "Tokoh Arjuna — Watak & Pusaka",         num: 3,  icon: "🏹" },
+        { id: "seNvo62vmK4", url: "https://youtu.be/seNvo62vmK4?si=dXtSSe1FwYRU8JGl",  title: "Semar & Punakawan — Filosofi",          num: 4,  icon: "🤝" },
+        { id: "7siN0YE3Yn4", url: "https://youtu.be/7siN0YE3Yn4?si=KDC-eVDlE1uBP7zL",  title: "Salam & Unggah-Ungguh Dasar",           num: 5,  icon: "🙏" },
+        { id: "QZrpaSMaMfA", url: "https://youtu.be/QZrpaSMaMfA?si=8HAFu6D4pjLFGNnn",  title: "Kosakata Tubuh Manusia (Basa Jawa)",    num: 6,  icon: "👤" },
+        { id: "UQWM7XoiUmY", url: "https://youtu.be/UQWM7XoiUmY?si=wsu1KvaXQcsoYMi7",  title: "Angka & Bilangan Jawa Kuno",            num: 7,  icon: "🔢" },
+        { id: "8Pg5D9lrCOE", url: "https://youtu.be/8Pg5D9lrCOE?si=u8noW05xvpL91DYi",  title: "Warna dalam Bahasa Krama Alus",         num: 8,  icon: "🎨" },
+        { id: "IfafFsjukRQ", url: "https://youtu.be/IfafFsjukRQ?si=cNXezzlWVI0kCrKq",  title: "Cerita Pandawa Lima (Ringkas)",         num: 9,  icon: "⚔️" },
+        { id: "u_VottplSr4", url: "https://youtu.be/u_VottplSr4?si=fCxNdMyk2F2ZtPZn",  title: "Huruf Aksara Jawa — Dasar Ha Na Ca",    num: 10, icon: "✍️" },
+        { id: "gW5UyDXoPic", url: "https://youtu.be/gW5UyDXoPic?si=mLIAwX2POdBIS23Q",  title: "Biantara — Pidato Krama Alus",          num: 11, icon: "🎤" },
+        { id: "IgBtSYtVa7Y", url: "https://youtu.be/IgBtSYtVa7Y?si=1rx2lHkqec_yrjgQ",  title: "Tokoh Yudistira — Raja & Bijaksana",    num: 12, icon: "👑" },
+        { id: "HP9HZOQOvVQ", url: "https://youtu.be/HP9HZOQOvVQ?si=Sa1MpyTBow2Y7ErV",  title: "Makna Simbol Wayang Kulit",             num: 13, icon: "🪄" },
+        { id: "u1j9uwNLJ7c", url: "https://youtu.be/u1j9uwNLJ7c?si=LraKo1CCPHYra0pv",  title: "Percakapan Sehari-hari Basa Krama",     num: 14, icon: "💬" },
+        { id: "NvvW_MIuT3Y", url: "https://youtu.be/NvvW_MIuT3Y?si=ty9lp3YeEbEgdZom",  title: "Alam & Lingkungan dalam Basa Jawa",     num: 15, icon: "🌿" },
+        { id: "ZnDzhU_h83c", url: "https://youtu.be/ZnDzhU_h83c?si=TW4-idHKDwQTUNMa",  title: "Makanan Tradisional Jawa + Kosakata",   num: 16, icon: "🍚" },
+        { id: "cCMbZuumHYs", url: "https://youtu.be/cCMbZuumHYs?si=EoloSOY_D-H1MNZS",  title: "Wayang & Kurikulum Sekolah",            num: 17, icon: "🏫" },
+        { id: "L_H64spAs6I", url: "https://youtu.be/L_H64spAs6I?si=CxBrzTOfs7oIhFiu",  title: "Tokoh Bima — Kekuatan & Watak",         num: 18, icon: "💪" },
+        { id: "q_d5mDTvKd4", url: "https://youtu.be/q_d5mDTvKd4?si=kGulPGjxEEFQ2e5m",  title: "Meneladani Sikap Eyang Semar",          num: 19, icon: "⚡" },
+        { id: "LzKI2nTgJDw", url: "https://youtu.be/LzKI2nTgJDw?si=5myVmpceDN4Qv3hJ",  title: "Tips Belajar Krama Alus untuk Siswa",   num: 20, icon: "🎓" }
+      ];
+
+      /* ── 30 VIDEO PRO (BERBAYAR) ─────────────────────────────────── */
+      var YT_VIDEOS_PRO = [
+        { id: "LzKI2nTgJDw", url: "https://youtu.be/LzKI2nTgJDw?si=weCUODuiM6K3dL_B",                   title: "Krama Inggil Level Mahir — Sesi 1",          num: 1,  icon: "👑" },
+        { id: "L6L_GfDpRtw", url: "https://youtu.be/L6L_GfDpRtw?si=4qStXGqXBXyTNG1F",                   title: "Krama Inggil Level Mahir — Sesi 2",          num: 2,  icon: "👑" },
+        { id: "epiIo4kEQbc", url: "https://youtu.be/epiIo4kEQbc?si=RLddQnyCQgz_W-4u",                   title: "Tembang Macapat — Asmaradana",               num: 3,  icon: "🎶" },
+        { id: "Oe_OK8E3eCM", url: "https://youtu.be/Oe_OK8E3eCM?si=ZIVUU-ZJaqA_gM2Z",                   title: "Tembang Macapat — Dhandhanggula",            num: 4,  icon: "🎶" },
+        { id: "Z78IMv-TWhA", url: "https://youtu.be/Z78IMv-TWhA?si=ol354-9Vl6dbCkg_",                   title: "Tembang Macapat — Sinom",                    num: 5,  icon: "🎶" },
+        { id: "5nmo63g_VUY", url: "https://youtu.be/5nmo63g_VUY?si=e0FNfZ9PpRvVaBCJ",                   title: "Seri Wayang: Nakula & Sadewa",               num: 6,  icon: "⚔️" },
+        { id: "-L_HwGHV9vc", url: "https://youtu.be/-L_HwGHV9vc?si=FlQzCaoviqJF1xSP",                   title: "Seri Wayang: Kresna — Strategi Perang",      num: 7,  icon: "🎭" },
+        { id: "Ih8HfXVDGVE", url: "https://youtu.be/Ih8HfXVDGVE?si=l6kzYjFWlnfllAPW",                   title: "Seri Wayang: Gatotkaca — Ksatria Udara",     num: 8,  icon: "🦅" },
+        { id: "SU0mUy06qSo", url: "https://youtu.be/SU0mUy06qSo?si=eHNBZnTzM9ups2AX",                   title: "Seri Wayang: Werkudara & Konteks Sastra",    num: 9,  icon: "📜" },
+        { id: "DyFR7Eikykc", url: "https://youtu.be/DyFR7Eikykc?si=1uvuK8ofF8oj_V3Y",                   title: "Seri Wayang: Duryudana & Kurawa",            num: 10, icon: "⚠️" },
+        { id: "qVQ5SR0jg1s", url: "https://youtu.be/qVQ5SR0jg1s?si=pVjyjMhnLPBR6H5g",                   title: "Gamelan — Instrumen & Laras Slendro",        num: 11, icon: "🥁" },
+        { id: "ClrFqS4dJY4", url: "https://youtu.be/ClrFqS4dJY4?si=pOT7SVIt_eDFH4bf",                   title: "Gamelan — Instrumen & Laras Pelog",          num: 12, icon: "🥁" },
+        { id: "ClrFqS4dJY4", url: "https://youtu.be/ClrFqS4dJY4?si=pOT7SVIt_eDFH4bf",                   title: "Batik Jawa — Motif & Filosofi",              num: 13, icon: "🎨" },
+        { id: "cUrTdIFQTA8", url: "https://youtu.be/cUrTdIFQTA8?si=sJVmNQvr5EB-pFlW",                   title: "Aksara Jawa Lengkap — Pasangan & Sandhangan",num: 14, icon: "✍️" },
+        { id: "xUI476wzVf0", url: "https://youtu.be/xUI476wzVf0?si=k4Qqix1-YXIhzubX",                   title: "Menulis Kalimat dalam Aksara Jawa",          num: 15, icon: "✍️" },
+        { id: "D7fnCTSaqMc", url: "https://youtu.be/D7fnCTSaqMc?si=RXQpeKprii_Ndpxc",                   title: "Upacara Adat Jawa — Mitoni & Tedak Siten",   num: 16, icon: "🕯️" },
+        { id: "DUdiUgHT5pc", url: "https://youtu.be/DUdiUgHT5pc?si=y6G0vSXhpN2daIiE",                   title: "Upacara Adat Jawa — Siraman & Midodareni",   num: 17, icon: "🌸" },
+        { id: "SY2jS05qhxU", url: "https://www.youtube.com/live/SY2jS05qhxU?si=jbtyFCVA_yXQstwb",      title: "Dalang & Seni Pedalangan",                   num: 18, icon: "🎪" },
+        { id: "nCyIXIT2et0", url: "https://youtu.be/nCyIXIT2et0?si=xm1LmVBdGMdlBh9x",                   title: "Biantara Perpisahan Kelas XII",               num: 19, icon: "🎤" },
+        { id: "szGT0hMJT8Y", url: "https://youtu.be/szGT0hMJT8Y?si=nSsgWu5P40J3qezm",                   title: "Biantara Hari Kemerdekaan",                  num: 20, icon: "🇮🇩" },
+        { id: "72SoPw3IgoI", url: "https://youtu.be/72SoPw3IgoI?si=AqY0zsP2m84dlhtR",                   title: "Surat Resmi Basa Krama — Struktur",          num: 21, icon: "📄" },
+        { id: "1wCIK4l2V04", url: "https://youtu.be/1wCIK4l2V04?si=W2_mq3ujD7DiSm5v",                   title: "Surat Resmi Basa Krama — Contoh",            num: 22, icon: "📄" },
+        { id: "xgSa14f0_LY", url: "https://youtu.be/xgSa14f0_LY?si=lqffftkDy1YrnPc8",                   title: "Paribasan & Bebasan Jawa (Peribahasa)",      num: 23, icon: "📚" },
+        { id: "Q_NGcR003sY", url: "https://youtu.be/Q_NGcR003sY?si=pr6UhbH_5y82XmJ8",                   title: "Unggah-Ungguh di Lingkungan Kerja",          num: 24, icon: "💼" },
+        { id: "WBDuHyvP5sQ", url: "https://youtu.be/WBDuHyvP5sQ?si=_SkPHFdrmnH40zk2",                   title: "Cerita Rakyat — Roro Jonggrang",             num: 25, icon: "🏛️" },
+        { id: "NztVQA74iDk", url: "https://youtu.be/NztVQA74iDk?si=Iq-THy1f1Q8LmkcN",                   title: "Cerita Rakyat — Ajisaka & Aksara Jawa",      num: 26, icon: "📖" },
+        { id: "xlPLL5X3Ei4", url: "https://youtu.be/xlPLL5X3Ei4?si=htI7KVuhEGreMBNu",                   title: "Review Soal UN Muatan Lokal Jawa",           num: 27, icon: "📝" },
+        { id: "beQHX3OBQlU", url: "https://youtu.be/beQHX3OBQlU?si=pL9bpepXwsMuOD9X",                   title: "Teknik Menghafal Kosakata Krama Alus",       num: 28, icon: "🧠" },
+        { id: "beQHX3OBQlU", url: "https://youtu.be/beQHX3OBQlU?si=7M3A69xu9St3K0Vh",                   title: "Presentasi Budaya Jawa dalam Krama Alus",    num: 29, icon: "🗣️" },
+        { id: "n3QOGuQjORs", url: "https://youtu.be/n3QOGuQjORs?si=4xSaJ-MKMDq8lMQq",                   title: "Ujian Akhir & Sertifikasi Pepak Digital",    num: 30, icon: "🏆" }
+      ];
+
+      /* ── FUNGSI RENDER & KONTROL ─────────────────────────────────── */
+      var _ytCurrentFree = 0;
+
+      /* Cek apakah ID masih placeholder (belum diisi) */
+      function ytIsPlaceholder(id) {
+        return !id || id.indexOf('VIDEO_') === 0 || id.trim() === '';
+      }
+
+      /* Bangun iframe embed — hanya dipanggil jika ID sudah valid */
+      function ytBuildIframe(videoId, title) {
+        return '<iframe src="https://www.youtube.com/embed/' + videoId +
+          '?rel=0&modestbranding=1" title="' + title +
+          '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
+          ' allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+      }
+
+      /* Layar kosong elegan saat ID belum diisi */
+      function ytBuildEmpty(v) {
+        return '<div class="yt-empty-state">' +
+          '<span class="yt-empty-icon">🎬</span>' +
+          '<p class="yt-empty-title">Video ' + v.num + ' — ' + v.title + '</p>' +
+          '<p class="yt-empty-hint">ID video belum diisi.<br>' +
+            'Buka <code>index.html</code>, cari <code>VIDEO_GRATIS_' +
+            (v.num < 10 ? '0' + v.num : v.num) +
+            '</code> dan ganti dengan ID YouTube Anda.</p>' +
+        '</div>';
+      }
+
+      function ytPlayFree(index) {
+        var v = YT_VIDEOS_FREE[index];
+        _ytCurrentFree = index;
+
+        var wrap = document.getElementById('yt-main-iframe-free');
+        if (wrap) {
+          wrap.innerHTML = ytIsPlaceholder(v.id)
+            ? ytBuildEmpty(v)
+            : ytBuildIframe(v.id, v.title);
+        }
+
+        /* Bar "Sedang Diputar" */
+        var titleEl = document.getElementById('yt-np-title-free');
+        if (titleEl) titleEl.textContent = 'Video ' + v.num + ' \u2014 ' + v.title;
+
+        /* Tombol "Buka di YouTube" — sembunyikan jika belum ada link nyata */
+        var linkEl = document.getElementById('yt-np-link-free');
+        if (linkEl) {
+          if (!ytIsPlaceholder(v.id)) {
+            linkEl.href = v.url;
+            linkEl.style.display = 'inline-flex';
+          } else {
+            linkEl.style.display = 'none';
+          }
+        }
+
+        /* Highlight thumbnail aktif */
+        var thumbs = document.querySelectorAll('#yt-thumb-grid-free .yt-thumb-item');
+        thumbs.forEach(function(t, i) { t.classList.toggle('active', i === index); });
+
+        /* Scroll ke player */
+        var playerWrap = document.getElementById('yt-main-player-wrap-free');
+        if (playerWrap) playerWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function ytInitFree() {
+        var grid = document.getElementById('yt-thumb-grid-free');
+        if (!grid) return;
+        var html = '';
+        YT_VIDEOS_FREE.forEach(function(v, i) {
+          var isReady = !ytIsPlaceholder(v.id);
+          html += '<div class="yt-thumb-item' + (i === 0 ? ' active' : '') +
+            (isReady ? '' : ' yt-thumb-pending') + '" ' +
+            'onclick="ytPlayFree(' + i + ')" role="button" tabindex="0" ' +
+            'onkeypress="if(event.key===\'Enter\')ytPlayFree(' + i + ')" ' +
+            'aria-label="' + (isReady ? 'Putar' : 'Belum diisi —') + ' video ' + v.num + ': ' + v.title + '">' +
+            '<div class="yt-thumb-img">' +
+              '<span class="yt-thumb-icon">' + v.icon + '</span>' +
+              '<span class="yt-thumb-play">' + (isReady ? '▶' : '…') + '</span>' +
+            '</div>' +
+            '<div class="yt-thumb-info">' +
+              '<span class="yt-thumb-num">Video ' + v.num + (isReady ? '' : ' ·  belum diisi') + '</span>' +
+              '<span class="yt-thumb-title">' + v.title + '</span>' +
+              (isReady
+                ? '<a class="yt-thumb-link" href="' + v.url + '" target="_blank" rel="noopener noreferrer" ' +
+                  'onclick="event.stopPropagation()" title="Buka di YouTube">↗ YouTube</a>'
+                : '<span class="yt-thumb-empty-tag">Isi ID video</span>'
+              ) +
+            '</div>' +
+          '</div>';
+        });
+        grid.innerHTML = html;
+        /* Muat video pertama di player */
+        ytPlayFree(0);
+      }
+
+      function ytInitPro() {
+        var grid = document.getElementById('yt-thumb-grid-pro');
+        if (!grid) return;
+        var html = '';
+        YT_VIDEOS_PRO.forEach(function(v) {
+          html += '<div class="yt-thumb-item yt-thumb-locked" aria-label="Video PRO terkunci: ' + v.title + '">' +
+            '<div class="yt-thumb-img">' +
+              '<span class="yt-thumb-icon">' + v.icon + '</span>' +
+              '<span class="yt-thumb-lock">🔒</span>' +
+            '</div>' +
+            '<div class="yt-thumb-info">' +
+              '<span class="yt-thumb-num">PRO ' + v.num + '</span>' +
+              '<span class="yt-thumb-title">' + v.title + '</span>' +
+            '</div>' +
+          '</div>';
+        });
+        grid.innerHTML = html;
+      }
+
+      function ytSwitchTab(tab) {
+        var panelFree = document.getElementById('yt-panel-free');
+        var panelPro  = document.getElementById('yt-panel-pro');
+        var tabFree   = document.getElementById('yt-tab-free');
+        var tabPro    = document.getElementById('yt-tab-pro');
+        if (tab === 'free') {
+          panelFree.style.display = 'block';
+          panelPro.style.display  = 'none';
+          tabFree.classList.add('active');
+          tabPro.classList.remove('active');
+          tabFree.setAttribute('aria-selected', 'true');
+          tabPro.setAttribute('aria-selected', 'false');
+        } else {
+          panelFree.style.display = 'none';
+          panelPro.style.display  = 'block';
+          tabFree.classList.remove('active');
+          tabPro.classList.add('active');
+          tabFree.setAttribute('aria-selected', 'false');
+          tabPro.setAttribute('aria-selected', 'true');
+        }
+      }
+
+      /* Init saat DOM siap */
+      document.addEventListener('DOMContentLoaded', function() {
+        ytInitFree();
+        ytInitPro();
+      });
+    </script>
 
   </main>
 
