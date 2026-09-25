@@ -27,6 +27,41 @@ class PepakAuth {
     this.ACCOUNTS_KEY = 'pepak_accounts_v2';
     this.SESSION_KEY  = 'pepak_session_v2';
     this.listeners    = [];
+
+    /* Migrasi otomatis dari v1 ke v2 jika v2 masih kosong */
+    this._migrateFromV1();
+  }
+
+  /* ── MIGRASI V1 → V2 ────────────────────────────────────────────────── */
+  _migrateFromV1() {
+    try {
+      /* Jika v2 sudah ada isi, tidak perlu migrasi */
+      const v2 = JSON.parse(localStorage.getItem(this.ACCOUNTS_KEY) || '[]');
+      if (v2.length > 0) return;
+
+      /* Coba ambil dari v1 */
+      const v1 = JSON.parse(localStorage.getItem('pepak_accounts_v1') || '[]');
+      if (v1.length === 0) return;
+
+      /* Tambahkan field status jika belum ada */
+      const migrated = v1.map(acc => ({
+        ...acc,
+        status:     acc.status || 'approved', /* akun v1 dianggap sudah approved */
+        approvedAt: acc.approvedAt || acc.createdAt || new Date().toISOString().split('T')[0],
+        approvedBy: acc.approvedBy || 'migration-v1'
+      }));
+
+      localStorage.setItem(this.ACCOUNTS_KEY, JSON.stringify(migrated));
+      console.log(`[Auth] Migrasi ${migrated.length} akun dari v1 → v2 berhasil.`);
+
+      /* Migrasi sesi v1 juga jika ada */
+      const sessV1 = localStorage.getItem('pepak_session_v1');
+      if (sessV1 && !localStorage.getItem(this.SESSION_KEY)) {
+        localStorage.setItem(this.SESSION_KEY, sessV1);
+      }
+    } catch(e) {
+      console.warn('[Auth] Migrasi v1→v2 gagal:', e);
+    }
   }
 
   /* ── STORAGE HELPERS ────────────────────────────────────────────────── */
