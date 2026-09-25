@@ -11,33 +11,81 @@ class PepakAuthUI {
   }
 
   /* ══════════════════════════════════════════════════════════════════════
-     INIT
+     INIT — async karena needsBootstrap() sekarang async (Supabase)
   ══════════════════════════════════════════════════════════════════════ */
-  init() {
+  async init() {
     const session = window.pepakAuth?.getSession();
 
     if (session) {
       this._enterApp(session, false);
     } else {
       this._lockApp();
-      /* Cek apakah perlu bootstrap Super Admin */
-      if (window.pepakAuth?.needsBootstrap()) {
-        this._showBootstrapForm();
-      } else {
-        this._showGate();
-      }
-    }
-
-    window.pepakAuth?.subscribe((sess) => {
-      if (!sess) {
-        this._lockApp();
-        if (window.pepakAuth?.needsBootstrap()) {
+      /* Tampilkan loading singkat saat cek ke Supabase */
+      this._showLoadingGate();
+      try {
+        const needs = await window.pepakAuth?.needsBootstrap();
+        this._hideLoadingGate();
+        if (needs) {
           this._showBootstrapForm();
         } else {
           this._showGate();
         }
+      } catch(e) {
+        this._hideLoadingGate();
+        this._showGate();
+      }
+    }
+
+    window.pepakAuth?.subscribe(async (sess) => {
+      if (!sess) {
+        this._lockApp();
+        this._showLoadingGate();
+        try {
+          const needs = await window.pepakAuth?.needsBootstrap();
+          this._hideLoadingGate();
+          if (needs) this._showBootstrapForm();
+          else        this._showGate();
+        } catch(e) {
+          this._hideLoadingGate();
+          this._showGate();
+        }
       }
     });
+  }
+
+  /* Loading gate singkat saat cek Supabase */
+  _showLoadingGate() {
+    let el = document.getElementById('pepak-loading-gate');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'pepak-loading-gate';
+      el.style.cssText = `
+        position:fixed;inset:0;z-index:10000;
+        background:linear-gradient(160deg,#1A0F08,#0D0704);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;`;
+      el.innerHTML = `
+        <div style="font-size:2.8rem;">🎭</div>
+        <div style="font-family:'Cinzel',serif;font-size:1.1rem;color:#D4A64C;letter-spacing:1px;">PEPAK DIGITAL</div>
+        <div style="width:48px;height:3px;background:rgba(212,166,76,0.2);border-radius:9999px;overflow:hidden;">
+          <div style="height:100%;background:#D4A64C;border-radius:9999px;
+            animation:pepakLoadBar 1.2s ease-in-out infinite;width:40%;"></div>
+        </div>
+        <style>
+          @keyframes pepakLoadBar {
+            0%   { transform:translateX(-100%); }
+            50%  { transform:translateX(200%); }
+            100% { transform:translateX(-100%); }
+          }
+        </style>`;
+      document.body.appendChild(el);
+    } else {
+      el.style.display = 'flex';
+    }
+  }
+
+  _hideLoadingGate() {
+    const el = document.getElementById('pepak-loading-gate');
+    if (el) el.style.display = 'none';
   }
 
   /* ══════════════════════════════════════════════════════════════════════
@@ -171,7 +219,7 @@ class PepakAuthUI {
     document.body.appendChild(overlay);
   }
 
-  submitBootstrap(e) {
+  async submitBootstrap(e) {
     e.preventDefault();
     const name     = document.getElementById('bs-name')?.value?.trim();
     const email    = document.getElementById('bs-email')?.value?.trim();
@@ -181,8 +229,8 @@ class PepakAuthUI {
 
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Membuat akun...'; }
 
-    setTimeout(() => {
-      const result = window.pepakAuth?.bootstrapSuperAdmin(name, email, password);
+    setTimeout(async () => {
+      const result = await window.pepakAuth?.bootstrapSuperAdmin(name, email, password);
 
       if (!result?.ok) {
         if (msgEl) {
@@ -194,7 +242,7 @@ class PepakAuthUI {
       }
 
       /* Langsung login */
-      const loginResult = window.pepakAuth?.login(email, password);
+      const loginResult = await window.pepakAuth?.login(email, password);
       if (loginResult?.ok) {
         document.getElementById('pepak-bootstrap-gate').style.display = 'none';
         this._enterApp(loginResult.session, true);
@@ -483,28 +531,34 @@ class PepakAuthUI {
     const emailInput = document.getElementById('gate-email');
     if (emailInput) emailInput.placeholder = `Email ${role}@domain.com`;
 
+    /* Sembunyikan tab "Daftar" saat role Admin dipilih — pendaftaran admin ditutup */
+    const tabReg = document.getElementById('gate-tab-register');
+    if (tabReg) {
+      if (role === 'admin') {
+        tabReg.style.display = 'none';
+        /* Paksa ke tab login jika sedang di tab daftar */
+        this.switchTab('login');
+      } else {
+        tabReg.style.display = '';
+      }
+    }
+
     this._setMsg('', '');
   }
 
   /* ══════════════════════════════════════════════════════════════════════
      SUBMIT LOGIN
   ══════════════════════════════════════════════════════════════════════ */
-  submitLogin(e) {
+  async submitLogin(e) {
     e.preventDefault();
-
     const email    = document.getElementById('gate-email')?.value?.trim();
     const password = document.getElementById('gate-password')?.value;
     const btn      = document.getElementById('gate-submit-btn');
 
-    if (!email || !password) {
-      this._setMsg('error', 'Email dan kata sandi wajib diisi.');
-      return;
-    }
-
+    if (!email || !password) { this._setMsg('error','Email dan kata sandi wajib diisi.'); return; }
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Memverifikasi...'; }
 
-    setTimeout(() => {
-      const result = window.pepakAuth?.login(email, password);
+    const result = await window.pepakAuth?.login(email, password);
 
       if (!result?.ok) {
         /* Pesan khusus untuk status pending & rejected */
