@@ -22,6 +22,56 @@ class PepakQuizEngine {
     this.isReviewMode = false;
   }
 
+  // ─────────────────────────────────────────────────────────────────────
+  // HELPER: ambil soal sesuai level dan unit yang sudah terbuka
+  // ─────────────────────────────────────────────────────────────────────
+  _getQByLevel(level, count) {
+    const all = window.PEPAK_QUESTION_BANK || [];
+    const filtered = all.filter(q => q.level === level);
+    return this.shuffleArray(filtered).slice(0, count);
+  }
+
+  _getQByUnit(unitNum, count) {
+    const all = window.PEPAK_QUESTION_BANK || [];
+    const filtered = all.filter(q => q.unit === unitNum);
+    return this.shuffleArray(filtered).slice(0, count);
+  }
+
+  // Campuran soal dari unit 1 sampai unit yang paling baru dibuka siswa
+  _getProgressiveQ(count) {
+    const all      = window.PEPAK_QUESTION_BANK || [];
+    const completed = window.pepakState?.state?.completedNodes || {};
+
+    // Hitung unit tertinggi yang sudah selesai (minimal unit 1)
+    let maxUnit = 1;
+    const units = window.PEPAK_DATA?.units || [];
+    units.forEach(u => {
+      const allDone = u.nodes.every(n => !!completed[n.id]);
+      if (allDone && u.number > maxUnit) maxUnit = u.number;
+    });
+
+    // Tentukan level berdasarkan unit terbuka
+    let levels;
+    if (maxUnit <= 5)       levels = ["pemula"];
+    else if (maxUnit <= 15) levels = ["pemula","menengah"];
+    else                    levels = ["pemula","menengah","mahir"];
+
+    const pool = all.filter(q =>
+      levels.includes(q.level) && (q.unit === undefined || q.unit <= maxUnit + 2)
+    );
+    return this.shuffleArray(pool).slice(0, count);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // HELPER: pastikan ada soal — fallback ke semua bank jika kurang
+  // ─────────────────────────────────────────────────────────────────────
+  _fallbackQuestions(preferred, count) {
+    if (preferred.length >= count) return preferred.slice(0, count);
+    const extra = this.shuffleArray(window.PEPAK_QUESTION_BANK || [])
+      .filter(q => !preferred.find(p => p.id === q.id));
+    return [...preferred, ...extra].slice(0, count);
+  }
+
   // Mulai sesi kuis untuk node tertentu
   startLesson(nodeId) {
     const unit = window.PEPAK_DATA?.units.find(u => u.nodes.some(n => n.id === nodeId));
@@ -30,41 +80,67 @@ class PepakQuizEngine {
       return;
     }
 
-    this.currentNodeId = nodeId;
-    this.currentUnitId = unit?.id;
-    this.currentIndex = 0;
-    this.score = 0;
-    this.earnedXP = 0;
-    this.correctCount = 0;
-    this.wrongCount = 0;
+    this.currentNodeId  = nodeId;
+    this.currentUnitId  = unit?.id;
+    this.currentIndex   = 0;
+    this.score = this.earnedXP = this.correctCount = this.wrongCount = 0;
     this.isAnswerChecked = false;
-    this.isReviewMode = false;
+    this.isReviewMode    = false;
 
-    // Ambil soal dari node atau bank soal
-    const qList = (window.PEPAK_DATA.questions[nodeId] || []).slice();
-    if (qList.length === 0) {
-      const allQ = window.PEPAK_QUESTION_BANK || [];
-      this.currentQuestions = this.shuffleArray(allQ).slice(0, 5);
+    // Soal dari node spesifik, atau ambil per unit-number
+    const unitNum = unit?.number || 1;
+    const nodeQ   = (window.PEPAK_DATA?.questions?.[nodeId] || []).slice();
+    if (nodeQ.length >= 5) {
+      this.currentQuestions = this.shuffleArray(nodeQ);
     } else {
-      this.currentQuestions = this.shuffleArray(qList);
+      // Ambil soal unit yang sesuai, minimal 8 soal
+      const byUnit = this._getQByUnit(unitNum, 12);
+      this.currentQuestions = this._fallbackQuestions(byUnit, 8);
     }
 
     window.app?.navigateTo("arena");
     this.renderQuestion();
   }
 
-  // Mulai latihan acak dari Arena Praktik (Free Practice)
+  // Latihan Acak — soal progresif sesuai kemajuan siswa (lebih banyak, terus berputar)
   startPracticeArena() {
-    const allQ = window.PEPAK_QUESTION_BANK || [];
-    this.currentQuestions = this.shuffleArray(allQ).slice(0, 6);
+    const q = this._getProgressiveQ(15);
+    this.currentQuestions = this._fallbackQuestions(q, 12);
     this.currentIndex = 0;
-    this.score = 0;
-    this.earnedXP = 0;
-    this.correctCount = 0;
-    this.wrongCount = 0;
-    this.currentNodeId = "arena-free-practice";
+    this.score = this.earnedXP = this.correctCount = this.wrongCount = 0;
+    this.currentNodeId   = "arena-free-practice";
     this.isAnswerChecked = false;
-    this.isReviewMode = false;
+    this.isReviewMode    = false;
+
+    window.app?.navigateTo("arena");
+    this.renderQuestion();
+  }
+
+  // Latihan per Level — pilih pemula / menengah / mahir
+  startLevelArena(level) {
+    const lvlMap = { pemula:"pemula", menengah:"menengah", mahir:"mahir" };
+    const lvl    = lvlMap[level] || "pemula";
+    const q      = this._getQByLevel(lvl, 20);
+    this.currentQuestions = this._fallbackQuestions(q, 15);
+    this.currentIndex = 0;
+    this.score = this.earnedXP = this.correctCount = this.wrongCount = 0;
+    this.currentNodeId   = `arena-level-${lvl}`;
+    this.isAnswerChecked = false;
+    this.isReviewMode    = false;
+
+    window.app?.navigateTo("arena");
+    this.renderQuestion();
+  }
+
+  // Latihan per Unit tertentu
+  startUnitArena(unitNumber) {
+    const q = this._getQByUnit(unitNumber, 15);
+    this.currentQuestions = this._fallbackQuestions(q, 10);
+    this.currentIndex = 0;
+    this.score = this.earnedXP = this.correctCount = this.wrongCount = 0;
+    this.currentNodeId   = `arena-unit-${unitNumber}`;
+    this.isAnswerChecked = false;
+    this.isReviewMode    = false;
 
     window.app?.navigateTo("arena");
     this.renderQuestion();
@@ -124,18 +200,15 @@ class PepakQuizEngine {
     this.renderQuestion();
   }
 
-  // Mulai Sesi Review Harian (Daily Challenge)
+  // Mulai Sesi Review Harian (Daily Challenge) — soal progresif
   startDailyReviewQuiz() {
-    const allQ = window.PEPAK_QUESTION_BANK || [];
-    this.currentQuestions = this.shuffleArray(allQ).slice(0, 8);
+    const q = this._getProgressiveQ(12);
+    this.currentQuestions = this._fallbackQuestions(q, 10);
     this.currentIndex = 0;
-    this.score = 0;
-    this.earnedXP = 0;
-    this.correctCount = 0;
-    this.wrongCount = 0;
-    this.currentNodeId = "arena-daily-review";
+    this.score = this.earnedXP = this.correctCount = this.wrongCount = 0;
+    this.currentNodeId   = "arena-daily-review";
     this.isAnswerChecked = false;
-    this.isReviewMode = false;
+    this.isReviewMode    = false;
 
     window.app?.navigateTo("arena");
     this.renderQuestion();
