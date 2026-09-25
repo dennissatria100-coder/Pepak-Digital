@@ -257,14 +257,27 @@ class PepakPaymentEngine {
     const modal = document.getElementById("payment-gateway-modal");
     if (modal) modal.classList.remove("show");
 
-    // Upgrade state pengguna
-    const invoice = window.pepakState?.subscribePlan(this.selectedPlanId, {
+    const planId   = this.selectedPlanId;
+    const userData = this.currentCheckoutData;
+
+    /* Aktivasi subscription di engine baru (token + masa aktif) */
+    if (window.pepakSubscription) {
+      window.pepakSubscription.activatePlan(
+        planId,
+        userData?.name,
+        userData?.email
+      ).then(() => {
+        window.app?.updateStatsHUD?.();
+      });
+    }
+
+    /* Simpan invoice ke pepakState (alur lama — tidak diubah) */
+    const invoice = window.pepakState?.subscribePlan(planId, {
       methodName: this.selectedMethodName,
-      name: this.currentCheckoutData?.name,
-      email: this.currentCheckoutData?.email
+      name:       userData?.name,
+      email:      userData?.email
     });
 
-    // Tampilkan Invoice Resmi
     if (invoice) {
       this.openInvoiceModal(invoice);
     }

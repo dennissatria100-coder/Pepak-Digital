@@ -370,72 +370,115 @@ const PEPAK_DATA = {
     return window.PEPAK_VOCAB_DB || [];
   },
 
-  // 5. PAKET HARGA LANGGANAN
+  // 5. PAKET HARGA LANGGANAN — 4 TIER
   subscriptionPlans: [
+    /* ── TIER 1: GRATIS ─────────────────────────────────── */
     {
       id: "free",
-      name: "Ksatria Siswa (Gratis)",
+      name: "Ksatria Pemula",
       price: 0,
       priceFormatted: "Rp 0",
       period: "Selamanya",
       badge: null,
-      desc: "Cocok untuk mulai mengenal dasar-dasar unggah-ungguh Bahasa Jawa.",
+      tokensPerDay: 7,
+      maxUnits: 5,
+      desc: "Mulai belajar Bahasa Jawa dengan akses dasar — 7 token/hari, Unit 1–5.",
       features: [
-        { text: "Akses Unit 1 & 2 (Unggah-Ungguh Dhasar)", included: true },
-        { text: "5 Tokoh Wayang Dasar (Arjuna, Yudhistira, Bima, Semar, Gareng)", included: true },
-        { text: "5 Nyawa Keris / Hari", included: true },
-        { text: "Kamus Pepak Mini Pencarian Terbatas", included: true },
-        { text: "Akses Penuh Seluruh 20 Unit Piwulang", included: false },
-        { text: "12+ Semua Tokoh Wayang & Pusaka Sakti", included: false },
-        { text: "Nyawa Keris Tak Terbatas (Unlimited)", included: false },
-        { text: "Unduh Sertifikat Digital Resmi", included: false },
-        { text: "Bebas Iklan Edukasi", included: false }
+        { text: "7 Token / Nyawa Keris per Hari (reset tiap 24 jam)", included: true },
+        { text: "Akses Unit 1–5 (Kasatriyan Dhasar)", included: true },
+        { text: "5 Tokoh Wayang Dasar", included: true },
+        { text: "20 Video Pembelajaran Gratis", included: true },
+        { text: "Kamus & Bank Soal Versi Terbatas", included: true },
+        { text: "Akses Unit 6–20 (Kasatriyan Lanjut)", included: false },
+        { text: "30 Video PRO Eksklusif", included: false },
+        { text: "Sertifikat Digital Resmi", included: false },
+        { text: "Bebas Promosi Upgrade", included: false }
       ],
-      ctaText: "Paket Saat Ini",
+      ctaText: "Paket Aktif Saat Ini",
       isPopular: false,
       buttonClass: "btn-outline-gold"
     },
+
+    /* ── TIER 2: REGULER ────────────────────────────────── */
     {
       id: "monthly",
-      name: "Ksatria Pinilih (Bulanan)",
+      name: "Ksatria Muda",
       price: 29000,
       priceFormatted: "Rp 29.000",
-      period: "/ bulan",
-      badge: "Akses Penuh",
-      desc: "Langganan fleksibel bulanan untuk belajar intensif tanpa batasan.",
+      period: "/ bulan (30 hari)",
+      badge: "🗡️ PEMULA BERBAYAR",
+      tokensPerDay: 15,
+      maxUnits: 10,
+      desc: "Perluas akses ke 10 unit, 15 token/hari, dan sebagian video PRO.",
       features: [
-        { text: "Akses 100% Seluruh 20 Unit Pelajaran", included: true },
-        { text: "500+ Database Kosakata & 300+ Bank Soal", included: true },
-        { text: "Nyawa Keris Emas Tak Terbatas (Unlimited)", included: true },
-        { text: "Mode Flashcard 3D & Latihan Ulang Spaced Repetition", included: true },
-        { text: "Audio Pelafalan Suara Jawa HD Sepuasnya", included: true },
-        { text: "Unduh Sertifikat Kelulusan Resmi Digital", included: true },
-        { text: "100% Bebas Iklan & Dukungan Prioritas", included: true }
+        { text: "15 Token / Nyawa Keris per Hari (reset tiap 24 jam)", included: true },
+        { text: "Akses Unit 1–10 (Kasatriyan Dhasar + Madya)", included: true },
+        { text: "10 Tokoh Wayang Lengkap", included: true },
+        { text: "20 Video Gratis + 10 Video PRO", included: true },
+        { text: "Kamus & Bank Soal Lebih Lengkap", included: true },
+        { text: "Bebas Promosi Upgrade", included: true },
+        { text: "Akses Unit 11–20 (Kasatriyan Utama & Maharesi)", included: false },
+        { text: "Sertifikat Digital Resmi", included: false },
+        { text: "Papan Peringkat Mingguan + Lencana Tier", included: false }
       ],
-      ctaText: "Pilih Bulanan (Rp 29rb)",
+      ctaText: "Pilih Ksatria Muda (Rp 29rb/bln)",
       isPopular: false,
       buttonClass: "btn-gold-action"
     },
+
+    /* ── TIER 3: MENENGAH ───────────────────────────────── */
     {
-      id: "yearly",
-      name: "Ksatria Maharesi (Tahunan)",
-      price: 199000,
-      priceFormatted: "Rp 199.000",
-      period: "/ tahun (Rp 16.500/bln)",
-      badge: "👑 POPULER • HEMAT 40%",
-      desc: "Pilihan terbaik untuk siswa, santri, dan pecinta kebudayaan Jawa.",
+      id: "semi",
+      name: "Ksatria Madya",
+      price: 59000,
+      priceFormatted: "Rp 59.000",
+      period: "/ bulan (30 hari)",
+      badge: "⚔️ PILIHAN POPULER",
+      tokensPerDay: 25,
+      maxUnits: 20,
+      desc: "Semua 20 unit, 30 video PRO, sertifikat dasar — pilihan paling seimbang.",
       features: [
-        { text: "Semua Fitur Premium Ksatria Pinilih", included: true },
-        { text: "Hemat Rp 149.000 Dibanding Bayar Bulanan", included: true },
-        { text: "Uji Coba Gratis 7 Hari Pertama (Trial)", included: true },
-        { text: "Lencana Emas Profil Eksklusif 'Maharesi'", included: true },
-        { text: "Akses Prioritas Bank Soal Ujian Sekolah", included: true },
-        { text: "Unduh Rekap Materi Pepak Digital PDF Lengkap", included: true }
+        { text: "25 Token / Nyawa Keris per Hari (reset tiap 24 jam)", included: true },
+        { text: "Akses PENUH Seluruh 20 Unit Piwulang", included: true },
+        { text: "12+ Semua Tokoh Wayang & Pusaka Sakti", included: true },
+        { text: "20 Video Gratis + 30 Video PRO (semua)", included: true },
+        { text: "Kamus 500+ Lengkap & 320+ Bank Soal Penuh", included: true },
+        { text: "Papan Peringkat Mingguan + Lencana Tier Madya", included: true },
+        { text: "Sertifikat Digital Dasar (setelah lulus semua unit)", included: true },
+        { text: "Bebas Promosi Upgrade", included: true },
+        { text: "Prioritas Dukungan & Early Access Konten Baru", included: false }
       ],
-      ctaText: "Mulai 7 Hari Gratis / Langganan",
+      ctaText: "Pilih Ksatria Madya (Rp 59rb/bln)",
       isPopular: true,
       buttonClass: "btn-gold-action"
     },
+
+    /* ── TIER 4: PREMIUM ────────────────────────────────── */
+    {
+      id: "yearly",
+      name: "Ksatria Maharesi Emas",
+      price: 199000,
+      priceFormatted: "Rp 199.000",
+      period: "/ bulan (30 hari)",
+      badge: "👑 PREMIUM TERLENGKAP",
+      tokensPerDay: 35,
+      maxUnits: 20,
+      desc: "35 token/hari, semua fitur, sertifikat resmi, early access, lencana eksklusif.",
+      features: [
+        { text: "35 Token / Nyawa Keris per Hari (+ 1× refill darurat/hari)", included: true },
+        { text: "Semua Fitur Ksatria Madya", included: true },
+        { text: "Sertifikat Digital Resmi Bertanda Tangan & Berlogo Pepak Digital", included: true },
+        { text: "Early Access Unit/Video/Tokoh Baru Sebelum Dirilis Publik", included: true },
+        { text: "Lencana Eksklusif 'Kasatriyan Emas' di Profil & Papan Peringkat", included: true },
+        { text: "Prioritas Dukungan (Chat Konsultasi Guru/Admin)", included: true },
+        { text: "Bonus Refill 1× Nyawa di Tengah Hari jika Habis", included: true }
+      ],
+      ctaText: "Pilih Ksatria Maharesi Emas (Rp 199rb/bln)",
+      isPopular: false,
+      buttonClass: "btn-gold-action"
+    },
+
+    /* ── PAKET SEKOLAH (B2B) ────────────────────────────── */
     {
       id: "school",
       name: "Paket Sekolah & Guru (B2B)",
@@ -443,11 +486,13 @@ const PEPAK_DATA = {
       priceFormatted: "Rp 15.000",
       period: "/ siswa / semester",
       badge: "🏛️ INSTITUSI & GURU",
-      desc: "Dirancang khusus untuk SD, SMP, SMA, SMK, dan Sanggar Seni Budaya.",
+      tokensPerDay: 35,
+      maxUnits: 20,
+      desc: "Dirancang untuk SD, SMP, SMA, SMK, dan Sanggar Seni Budaya.",
       features: [
-        { text: "Akses Premium Penuh untuk Seluruh Siswa di Kelas", included: true },
-        { text: "Dashboard Monitoring Guru & Rekap Nilai Kuis Otomatis", included: true },
-        { text: "Ekspor Laporan Nilai Raport Kurikulum Merdeka (CSV/PDF)", included: true },
+        { text: "Akses Premium (setara Ksatria Maharesi) untuk Semua Siswa", included: true },
+        { text: "Dashboard Monitoring Guru & Rekap Nilai Otomatis", included: true },
+        { text: "Ekspor Laporan Nilai Kurikulum Merdeka (CSV/PDF)", included: true },
         { text: "Manajemen Akun Siswa Massal (Import Excel)", included: true },
         { text: "Invoice Resmi & Faktur Pajak Sekolah", included: true }
       ],
