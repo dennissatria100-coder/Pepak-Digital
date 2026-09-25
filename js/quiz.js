@@ -70,8 +70,40 @@ class PepakQuizEngine {
     this.renderQuestion();
   }
 
+  // Seed soal-soal sulit (level mahir) ke mistakeBank jika masih kosong
+  // Dipanggil otomatis saat user pertama kali buka Latihan Soal Sulit
+  seedHardQuestionsIfEmpty() {
+    const state = window.pepakState?.state;
+    if (!state) return;
+    if (state.mistakeBank && state.mistakeBank.length > 0) return; // sudah ada isi
+
+    const allQ = window.PEPAK_QUESTION_BANK || [];
+
+    // Ambil soal level mahir dari semua tipe
+    const hardQ = allQ.filter(q => q.level === "mahir");
+
+    // Tambah juga soal sentence-builder, wayang-quiz, matching (cenderung sulit)
+    const extraHard = allQ.filter(q =>
+      (q.type === "sentence-builder" || q.type === "wayang-quiz" || q.type === "matching") &&
+      q.level !== "pemula"
+    );
+
+    // Gabung unik, ambil 30 soal perwakilan
+    const combined = [...hardQ];
+    extraHard.forEach(q => {
+      if (!combined.find(c => c.id === q.id)) combined.push(q);
+    });
+
+    // Acak dan ambil 30
+    const seeded = this.shuffleArray(combined).slice(0, 30);
+    seeded.forEach(q => window.pepakState.addMistake(q));
+  }
+
   // Mulai Sesi Latihan Ulang Kesalahan (Spaced Repetition / Mistake Bank)
   startSpacedRepetitionQuiz() {
+    // Seed soal sulit otomatis jika mistakeBank masih kosong
+    this.seedHardQuestionsIfEmpty();
+
     const mistakes = window.pepakState?.state.mistakeBank || [];
     if (mistakes.length === 0) {
       alert("🎉 Sugeng! Panjenengan dereng gadhah cathetan soal ingkang lepat. Sedaya wangsulan sampun leres!");
