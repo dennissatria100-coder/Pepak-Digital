@@ -147,28 +147,7 @@
         </button>
       </form>
 
-      <!-- Demo credentials -->
-      <div class="gate-divider">Akun Demo — Klik untuk Autofill</div>
-
-      <div class="gate-demo">
-        <div class="gate-demo-title">🧪 Coba Langsung Tanpa Registrasi</div>
-        <div class="gate-demo-row">
-          <span class="gate-role-pill-mini">SISWA</span>
-          <code onclick="window.pepakAuthUI?.fillDemo('siswa@pepak.edu','siswa123')" title="Klik autofill">siswa@pepak.edu</code>
-          <code onclick="window.pepakAuthUI?.fillDemo('siswa@pepak.edu','siswa123')" title="Klik autofill">siswa123</code>
-        </div>
-        <div class="gate-demo-row">
-          <span class="gate-role-pill-mini guru">GURU</span>
-          <code onclick="window.pepakAuthUI?.fillDemo('guru@pepak.edu','guru123')" title="Klik autofill">guru@pepak.edu</code>
-          <code onclick="window.pepakAuthUI?.fillDemo('guru@pepak.edu','guru123')" title="Klik autofill">guru123</code>
-        </div>
-        <div class="gate-demo-row">
-          <span class="gate-role-pill-mini admin">ADMIN</span>
-          <code onclick="window.pepakAuthUI?.fillDemo('admin@pepak.edu','admin123')" title="Klik autofill">admin@pepak.edu</code>
-          <code onclick="window.pepakAuthUI?.fillDemo('admin@pepak.edu','admin123')" title="Klik autofill">admin123</code>
-        </div>
-      </div>
-
+      <!-- Info keamanan -->
       <div class="gate-footer-note">
         🔒 Data tersimpan lokal di perangkat Anda — aman & privat
       </div>
@@ -189,23 +168,59 @@
         <span class="admin-badge-icon">🛡️</span>
         <div>
           <h2 class="admin-page-title">Panel Admin — Pepak Digital</h2>
-          <p class="admin-page-sub">Manajemen pengguna, role, dan data platform.</p>
+          <p class="admin-page-sub">Manajemen pengguna, role, persetujuan akun, dan data platform.</p>
         </div>
       </div>
-      <div class="admin-stats-row" id="admin-stats-row"></div>
-      <div class="admin-table-card">
-        <div class="admin-table-topbar">
-          <span class="admin-table-title">👥 Daftar Pengguna Terdaftar</span>
-          <button class="btn-outline-gold" style="padding:0.4rem 1rem;font-size:0.82rem;"
-            onclick="window.pepakAuthUI?.renderAdminPanel()">↻ Refresh</button>
-        </div>
-        <div style="overflow-x:auto;">
-          <table class="admin-users-table">
-            <thead><tr><th>Avatar</th><th>Nama</th><th>Email</th><th>Role</th><th>Ubah Role</th><th>Aksi</th></tr></thead>
-            <tbody id="admin-users-tbody"></tbody>
-          </table>
+
+      <!-- Tab navigasi admin -->
+      <div style="display:flex;gap:0.6rem;margin-bottom:1.8rem;flex-wrap:wrap;">
+        <button class="btn-gold-action" style="font-size:0.85rem;padding:0.5rem 1.1rem;"
+          onclick="window.pepakAuthUI?.showAdminTab('users')">👥 Pengguna</button>
+        <button class="btn-outline-gold" style="font-size:0.85rem;padding:0.5rem 1.1rem;position:relative;"
+          onclick="window.pepakAuthUI?.showAdminTab('approvals')" id="admin-tab-approvals-btn">
+          ✅ Persetujuan Akun
+          <span id="admin-pending-badge" style="display:none;position:absolute;top:-6px;right:-6px;
+            background:#E63946;color:#fff;font-size:0.62rem;font-weight:900;
+            width:18px;height:18px;border-radius:50%;display:flex;align-items:center;
+            justify-content:center;line-height:1;">0</span>
+        </button>
+      </div>
+
+      <!-- Panel: Daftar Pengguna -->
+      <div id="admin-panel-users">
+        <div class="admin-stats-row" id="admin-stats-row"></div>
+        <div class="admin-table-card">
+          <div class="admin-table-topbar">
+            <span class="admin-table-title">👥 Daftar Pengguna Terdaftar</span>
+            <button class="btn-outline-gold" style="padding:0.4rem 1rem;font-size:0.82rem;"
+              onclick="window.pepakAuthUI?.renderAdminPanel()">↻ Refresh</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-users-table">
+              <thead><tr><th>Avatar</th><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Ubah Role</th><th>Aksi</th></tr></thead>
+              <tbody id="admin-users-tbody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      <!-- Panel: Persetujuan Akun Pending -->
+      <div id="admin-panel-approvals" style="display:none;">
+        <div class="admin-table-card">
+          <div class="admin-table-topbar">
+            <span class="admin-table-title">⏳ Pendaftar Menunggu Persetujuan</span>
+            <button class="btn-outline-gold" style="padding:0.4rem 1rem;font-size:0.82rem;"
+              onclick="window.pepakAuthUI?.renderApprovalPanel()">↻ Refresh</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-users-table">
+              <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Tanggal Daftar</th><th>Aksi</th></tr></thead>
+              <tbody id="admin-approvals-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 

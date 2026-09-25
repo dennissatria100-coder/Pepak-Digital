@@ -1,71 +1,38 @@
 /**
- * PEPAK DIGITAL — AUTH ENGINE (3 ROLE: SISWA, GURU, ADMIN)
- * Frontend-only authentication menggunakan localStorage.
- * Akun demo bawaan + registrasi akun baru.
+ * PEPAK DIGITAL — AUTH ENGINE v2 (DENGAN APPROVAL SYSTEM)
+ * ═══════════════════════════════════════════════════════════════════════
+ * Sistem autentikasi frontend-only menggunakan localStorage.
  *
- * Role & Hak Akses:
- *   siswa  → akses penuh fitur belajar standar
- *   guru   → siswa + dashboard guru / kelas
- *   admin  → semua + panel manajemen pengguna
+ * ⚠️  CATATAN PENTING UNTUK PRODUKSI:
+ *     localStorage TIDAK aman untuk menyimpan password & status approval
+ *     di lingkungan produksi multi-perangkat. Upgrade ke backend nyata
+ *     (Node.js/Express + database, Firebase Auth, Supabase, dll) sebelum
+ *     deploy ke pengguna sungguhan.
+ *
+ * Alur per role:
+ *   Siswa  → daftar → langsung aktif → bisa login
+ *   Guru   → daftar → status "pending" → TUNGGU persetujuan admin → aktif
+ *   Admin  → daftar → status "pending" → TUNGGU persetujuan super admin
+ *
+ * Super Admin pertama:
+ *   Jika BELUM ada akun admin approved di sistem, halaman login menampilkan
+ *   form bootstrap khusus (hanya muncul sekali) untuk membuat admin pertama.
+ *   Admin pertama langsung approved tanpa perlu persetujuan karena tidak ada
+ *   admin lain yang bisa menyetujui.
+ * ═══════════════════════════════════════════════════════════════════════
  */
 
 class PepakAuth {
   constructor() {
-    this.ACCOUNTS_KEY  = "pepak_accounts_v1";
-    this.SESSION_KEY   = "pepak_session_v1";
-    this.listeners     = [];
-
-    /* Akun demo bawaan — langsung bisa dicoba */
-    this._seedDefaultAccounts();
-  }
-
-  /* ── SEED AKUN DEMO ─────────────────────────────────────────────────── */
-  _seedDefaultAccounts() {
-    const existing = this._loadAccounts();
-    const demos = [
-      {
-        id: "acc-siswa-demo",
-        name: "Arjuna Ksatria",
-        email: "siswa@pepak.edu",
-        password: "siswa123",
-        role: "siswa",
-        avatar: "🎒",
-        createdAt: "2026-01-01"
-      },
-      {
-        id: "acc-guru-demo",
-        name: "Ki Pamong Jawi",
-        email: "guru@pepak.edu",
-        password: "guru123",
-        role: "guru",
-        avatar: "👨‍🏫",
-        createdAt: "2026-01-01"
-      },
-      {
-        id: "acc-admin-demo",
-        name: "Admin Pepak Digital",
-        email: "admin@pepak.edu",
-        password: "admin123",
-        role: "admin",
-        avatar: "🛡️",
-        createdAt: "2026-01-01"
-      }
-    ];
-
-    /* Tambahkan hanya yang belum ada */
-    demos.forEach(demo => {
-      if (!existing.find(a => a.id === demo.id)) {
-        existing.push(demo);
-      }
-    });
-    this._saveAccounts(existing);
+    this.ACCOUNTS_KEY = 'pepak_accounts_v2';
+    this.SESSION_KEY  = 'pepak_session_v2';
+    this.listeners    = [];
   }
 
   /* ── STORAGE HELPERS ────────────────────────────────────────────────── */
   _loadAccounts() {
-    try {
-      return JSON.parse(localStorage.getItem(this.ACCOUNTS_KEY) || "[]");
-    } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(this.ACCOUNTS_KEY) || '[]'); }
+    catch { return []; }
   }
 
   _saveAccounts(list) {
@@ -73,65 +40,179 @@ class PepakAuth {
   }
 
   _loadSession() {
-    try {
-      return JSON.parse(localStorage.getItem(this.SESSION_KEY) || "null");
-    } catch { return null; }
+    try { return JSON.parse(localStorage.getItem(this.SESSION_KEY) || 'null'); }
+    catch { return null; }
   }
 
   _saveSession(session) {
-    if (session) {
-      localStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
-    } else {
-      localStorage.removeItem(this.SESSION_KEY);
-    }
+    if (session) localStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
+    else         localStorage.removeItem(this.SESSION_KEY);
     this.listeners.forEach(fn => fn(session));
   }
 
-  /* ── PUBLIC API ─────────────────────────────────────────────────────── */
+  /* ── PUBLIC SESSION API ─────────────────────────────────────────────── */
+  getSession()  { return this._loadSession(); }
+  isLoggedIn()  { return !!this._loadSession(); }
+  getRole()     { return this._loadSession()?.role || 'tamu'; }
+  isAdmin()     { return this.getRole() === 'admin'; }
+  isGuru()      { return this.getRole() === 'guru' || this.isAdmin(); }
 
-  /** Sesi aktif saat ini (null = belum login / tamu) */
-  getSession() {
-    return this._loadSession();
+  /* ── BOOTSTRAP CHECK ────────────────────────────────────────────────── */
+  /**
+   * Kembalikan true jika sistem belum memiliki satupun admin yang approved.
+   * Dipakai untuk memunculkan form bootstrap Super Admin pertama.
+   */
+  needsBootstrap() {
+    const accounts = this._loadAccounts();
+    return !accounts.some(a => a.role === 'admin' && a.status === 'approved');
   }
-
-  isLoggedIn() {
-    return !!this._loadSession();
-  }
-
-  getRole() {
-    return this._loadSession()?.role || "tamu";
-  }
-
-  isAdmin() { return this.getRole() === "admin"; }
-  isGuru()  { return this.getRole() === "guru" || this.isAdmin(); }
 
   /**
+   * Buat Super Admin pertama — hanya bisa dipanggil saat needsBootstrap() = true.
+   * Admin pertama langsung approved (tidak perlu persetujuan karena tidak ada admin lain).
+   */
+  bootstrapSuperAdmin(name, email, password) {
+    if (!this.needsBootstrap()) {
+      return { ok: false, error: 'Super Admin sudah ada. Gunakan form daftar biasa.' };
+    }
+    if (!name || !email || !password) {
+      return { ok: false, error: 'Semua kolom wajib diisi.' };
+    }
+    if (password.length < 8) {
+      return { ok: false, error: 'Kata sandi minimal 8 karakter.' };
+    }
+
+    const accounts = this._loadAccounts();
+    if (accounts.find(a => a.email.toLowerCase() === email.trim().toLowerCase())) {
+      return { ok: false, error: 'Email sudah terdaftar.' };
+    }
+
+    const admin = {
+      id:        'acc-' + Date.now(),
+      name:      name.trim(),
+      email:     email.trim().toLowerCase(),
+      password,                         // ⚠️ plain text — ganti hash di produksi
+      role:      'admin',
+      status:    'approved',            // langsung aktif
+      avatar:    '🛡️',
+      createdAt: new Date().toISOString().split('T')[0],
+      approvedAt: new Date().toISOString().split('T')[0],
+      approvedBy: 'system-bootstrap'
+    };
+
+    accounts.push(admin);
+    this._saveAccounts(accounts);
+    return { ok: true };
+  }
+
+  /* ── REGISTRASI ─────────────────────────────────────────────────────── */
+  /**
+   * Daftar akun baru.
+   * Siswa → status 'approved' (langsung aktif)
+   * Guru  → status 'pending'  (tunggu persetujuan admin)
+   * Admin (via form publik) → status 'pending' (tunggu super admin)
+   *
+   * @returns { ok, error?, pendingApproval? }
+   */
+  register(name, email, password, role) {
+    if (!name || !email || !password) {
+      return { ok: false, error: 'Semua kolom wajib diisi.' };
+    }
+    if (!['siswa', 'guru'].includes(role)) {
+      return { ok: false, error: 'Role tidak valid.' };
+    }
+    if (password.length < 6) {
+      return { ok: false, error: 'Kata sandi minimal 6 karakter.' };
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return { ok: false, error: 'Format email tidak valid.' };
+    }
+
+    const accounts = this._loadAccounts();
+    if (accounts.find(a => a.email.toLowerCase() === email.trim().toLowerCase())) {
+      return { ok: false, error: 'Email sudah terdaftar. Silakan login.' };
+    }
+
+    const avatarMap = { siswa: '🎒', guru: '👨‍🏫' };
+    const newAcc = {
+      id:        'acc-' + Date.now(),
+      name:      name.trim(),
+      email:     email.trim().toLowerCase(),
+      password,                         // ⚠️ plain text — ganti hash di produksi
+      role,
+      status:    role === 'siswa' ? 'approved' : 'pending',
+      avatar:    avatarMap[role],
+      createdAt: new Date().toISOString().split('T')[0],
+      approvedAt: null,
+      approvedBy: null
+    };
+
+    accounts.push(newAcc);
+    this._saveAccounts(accounts);
+
+    if (role === 'siswa') {
+      /* Siswa langsung login */
+      return this.login(email.trim(), password);
+    } else {
+      /* Guru → pending, kembalikan flag khusus */
+      return { ok: true, pendingApproval: true, role, name: newAcc.name };
+    }
+  }
+
+  /* ── LOGIN ──────────────────────────────────────────────────────────── */
+  /**
    * Login dengan email + password.
-   * @returns { ok: boolean, error?: string, session?: object }
+   * Memvalidasi status akun sebelum mengizinkan masuk.
+   *
+   * @returns { ok, error?, session?, pendingApproval?, rejected? }
    */
   login(email, password) {
     const accounts = this._loadAccounts();
     const acc = accounts.find(
-      a => a.email.trim().toLowerCase() === email.trim().toLowerCase() &&
-           a.password === password
+      a => a.email.toLowerCase() === email.trim().toLowerCase()
+        && a.password === password
     );
 
     if (!acc) {
-      return { ok: false, error: "Email atau kata sandi salah." };
+      return { ok: false, error: 'Email atau kata sandi salah.' };
+    }
+
+    /* Cek status akun */
+    if (acc.status === 'pending') {
+      const roleLabel = acc.role === 'guru' ? 'Guru' : 'Admin';
+      return {
+        ok: false,
+        pendingApproval: true,
+        error: `Akun ${roleLabel} Anda masih menunggu persetujuan Admin. ` +
+               `Anda akan dapat login setelah akun disetujui.`
+      };
+    }
+
+    if (acc.status === 'rejected') {
+      return {
+        ok: false,
+        rejected: true,
+        error: 'Pendaftaran Anda telah ditolak oleh Admin. ' +
+               'Silakan hubungi Admin untuk informasi lebih lanjut.'
+      };
+    }
+
+    if (acc.status !== 'approved') {
+      return { ok: false, error: 'Status akun tidak valid. Hubungi Admin.' };
     }
 
     const session = {
-      id:        acc.id,
-      name:      acc.name,
-      email:     acc.email,
-      role:      acc.role,
-      avatar:    acc.avatar,
-      loginAt:   new Date().toISOString()
+      id:      acc.id,
+      name:    acc.name,
+      email:   acc.email,
+      role:    acc.role,
+      avatar:  acc.avatar,
+      loginAt: new Date().toISOString()
     };
 
     this._saveSession(session);
 
-    /* Sinkron ke pepakState.user agar HUD & profil ikut update */
+    /* Sinkron ke pepakState */
     if (window.pepakState) {
       window.pepakState.state.user.name   = acc.name;
       window.pepakState.state.user.email  = acc.email;
@@ -143,91 +224,112 @@ class PepakAuth {
     return { ok: true, session };
   }
 
-  /**
-   * Registrasi akun baru.
-   * @param {string} role — "siswa" | "guru"  (admin tidak boleh self-register)
-   */
-  register(name, email, password, role) {
-    if (!name || !email || !password) {
-      return { ok: false, error: "Semua kolom wajib diisi." };
-    }
-    if (!["siswa", "guru"].includes(role)) {
-      return { ok: false, error: "Role tidak valid." };
-    }
-    if (password.length < 6) {
-      return { ok: false, error: "Kata sandi minimal 6 karakter." };
-    }
-
-    const accounts = this._loadAccounts();
-    if (accounts.find(a => a.email.trim().toLowerCase() === email.trim().toLowerCase())) {
-      return { ok: false, error: "Email sudah terdaftar. Silakan login." };
-    }
-
-    const avatarMap = { siswa: "🎒", guru: "👨‍🏫" };
-    const newAcc = {
-      id:        "acc-" + Date.now(),
-      name:      name.trim(),
-      email:     email.trim().toLowerCase(),
-      password,
-      role,
-      avatar:    avatarMap[role],
-      createdAt: new Date().toISOString().split("T")[0]
-    };
-
-    accounts.push(newAcc);
-    this._saveAccounts(accounts);
-    return this.login(newAcc.email, newAcc.password);
-  }
-
-  /** Logout — hapus sesi, kembalikan ke guest */
+  /* ── LOGOUT ─────────────────────────────────────────────────────────── */
   logout() {
     this._saveSession(null);
     if (window.pepakState) {
       const def = window.pepakState.getDefaultState();
       window.pepakState.state.user.name  = def.user.name;
       window.pepakState.state.user.email = def.user.email;
-      window.pepakState.state.user.role  = "tamu";
+      window.pepakState.state.user.role  = 'tamu';
       window.pepakState.saveState();
     }
   }
 
-  /** Subscribe ke perubahan sesi */
+  /* ── SUBSCRIBE ──────────────────────────────────────────────────────── */
   subscribe(fn) {
     this.listeners.push(fn);
     return () => { this.listeners = this.listeners.filter(l => l !== fn); };
   }
 
-  /* ── ADMIN HELPERS ──────────────────────────────────────────────────── */
+  /* ══════════════════════════════════════════════════════════════════════
+     ADMIN API
+  ══════════════════════════════════════════════════════════════════════ */
 
-  /** Ambil semua akun (hanya untuk admin) */
+  /** Semua akun approved (untuk tabel pengguna) */
   getAllAccounts() {
     if (!this.isAdmin()) return [];
-    return this._loadAccounts().map(a => ({
-      id: a.id, name: a.name, email: a.email,
-      role: a.role, avatar: a.avatar, createdAt: a.createdAt
-    }));
+    return this._loadAccounts()
+      .filter(a => a.status === 'approved')
+      .map(a => ({
+        id: a.id, name: a.name, email: a.email,
+        role: a.role, avatar: a.avatar, createdAt: a.createdAt
+      }));
   }
 
-  /** Update role akun (hanya admin) */
+  /** Semua akun pending (untuk panel persetujuan) */
+  getPendingAccounts() {
+    if (!this.isAdmin()) return [];
+    return this._loadAccounts()
+      .filter(a => a.status === 'pending')
+      .map(a => ({
+        id: a.id, name: a.name, email: a.email,
+        role: a.role, createdAt: a.createdAt
+      }));
+  }
+
+  /** Semua akun rejected */
+  getRejectedAccounts() {
+    if (!this.isAdmin()) return [];
+    return this._loadAccounts()
+      .filter(a => a.status === 'rejected')
+      .map(a => ({
+        id: a.id, name: a.name, email: a.email,
+        role: a.role, createdAt: a.createdAt
+      }));
+  }
+
+  /** Setujui akun pending → status 'approved' */
+  approveAccount(accountId) {
+    if (!this.isAdmin()) return { ok: false, error: 'Tidak diizinkan.' };
+
+    const accounts = this._loadAccounts();
+    const acc = accounts.find(a => a.id === accountId);
+    if (!acc) return { ok: false, error: 'Akun tidak ditemukan.' };
+    if (acc.status !== 'pending') return { ok: false, error: 'Akun tidak dalam status pending.' };
+
+    acc.status     = 'approved';
+    acc.approvedAt = new Date().toISOString().split('T')[0];
+    acc.approvedBy = this.getSession()?.id || 'admin';
+    this._saveAccounts(accounts);
+    return { ok: true };
+  }
+
+  /** Tolak akun pending → status 'rejected' */
+  rejectAccount(accountId) {
+    if (!this.isAdmin()) return { ok: false, error: 'Tidak diizinkan.' };
+
+    const accounts = this._loadAccounts();
+    const acc = accounts.find(a => a.id === accountId);
+    if (!acc) return { ok: false, error: 'Akun tidak ditemukan.' };
+
+    acc.status    = 'rejected';
+    acc.rejectedAt = new Date().toISOString().split('T')[0];
+    this._saveAccounts(accounts);
+    return { ok: true };
+  }
+
+  /** Hapus akun (admin, tidak bisa hapus diri sendiri) */
+  deleteAccount(accountId) {
+    if (!this.isAdmin()) return false;
+    if (accountId === this.getSession()?.id) return false;
+    this._saveAccounts(this._loadAccounts().filter(a => a.id !== accountId));
+    return true;
+  }
+
+  /** Update role akun */
   updateRole(accountId, newRole) {
     if (!this.isAdmin()) return false;
     const accounts = this._loadAccounts();
     const acc = accounts.find(a => a.id === accountId);
-    if (acc) {
-      acc.role = newRole;
-      this._saveAccounts(accounts);
-      return true;
-    }
+    if (acc) { acc.role = newRole; this._saveAccounts(accounts); return true; }
     return false;
   }
 
-  /** Hapus akun (hanya admin, tidak bisa hapus diri sendiri) */
-  deleteAccount(accountId) {
-    if (!this.isAdmin()) return false;
-    if (accountId === this.getSession()?.id) return false;
-    const accounts = this._loadAccounts().filter(a => a.id !== accountId);
-    this._saveAccounts(accounts);
-    return true;
+  /** Jumlah akun pending (untuk badge notifikasi) */
+  getPendingCount() {
+    if (!this.isAdmin()) return 0;
+    return this._loadAccounts().filter(a => a.status === 'pending').length;
   }
 }
 

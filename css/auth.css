@@ -256,6 +256,19 @@
   border: 1px solid rgba(46,196,182,0.3);
   display: block;
 }
+.auth-msg.pending {
+  background: rgba(255,158,0,0.14);
+  color: #FF9E00;
+  border: 1px solid rgba(255,158,0,0.3);
+  display: block;
+  white-space: pre-line;
+}
+.auth-msg.rejected {
+  background: rgba(230,57,70,0.14);
+  color: #FF7B84;
+  border: 1px solid rgba(230,57,70,0.3);
+  display: block;
+}
 
 /* Submit button */
 .gate-submit-btn {
