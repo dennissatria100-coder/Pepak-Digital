@@ -704,7 +704,6 @@ class PepakAuthUI {
     const usersPanel    = document.getElementById('admin-panel-users');
     const approvalPanel = document.getElementById('admin-panel-approvals');
     if (!usersPanel || !approvalPanel) return;
-
     if (tab === 'users') {
       usersPanel.style.display    = '';
       approvalPanel.style.display = 'none';
@@ -719,10 +718,14 @@ class PepakAuthUI {
   /* ══════════════════════════════════════════════════════════════════════
      ADMIN PANEL — DAFTAR PENGGUNA
   ══════════════════════════════════════════════════════════════════════ */
-  renderAdminPanel() {
+  async renderAdminPanel() {
     if (!window.pepakAuth?.isAdmin()) return;
 
-    const accounts = window.pepakAuth.getAllAccounts();
+    /* Loading state */
+    const tbody = document.getElementById('admin-users-tbody');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="padding:2rem;text-align:center;color:#8E7A68;">⏳ Memuat data...</td></tr>`;
+
+    const accounts = await window.pepakAuth.getAllAccounts();
 
     const statsEl = document.getElementById('admin-stats-row');
     if (statsEl) {
@@ -735,13 +738,17 @@ class PepakAuthUI {
         <div class="admin-stat-card"><span class="admin-stat-num">${guru}</span><span class="admin-stat-lbl">👨‍🏫 Guru</span></div>`;
     }
 
-    const tbody = document.getElementById('admin-users-tbody');
     if (!tbody) return;
+
+    if (accounts.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="padding:2rem;text-align:center;color:#8E7A68;">Belum ada pengguna terdaftar.</td></tr>`;
+      return;
+    }
 
     const currentId = window.pepakAuth.getSession()?.id;
     tbody.innerHTML = accounts.map(acc => `
       <tr>
-        <td style="font-size:1.3rem;">${acc.avatar}</td>
+        <td style="font-size:1.3rem;">${acc.avatar || '👤'}</td>
         <td style="font-weight:700;color:#F0E6D2;">${acc.name}${acc.id === currentId ? ' <span style="color:#D4A64C;font-size:0.7rem;">(Anda)</span>' : ''}</td>
         <td style="color:#C8B89E;">${acc.email}</td>
         <td><span class="auth-nav-role-badge ${acc.role==='admin'?'admin':acc.role==='guru'?'guru':''}">${acc.role.toUpperCase()}</span></td>
@@ -763,36 +770,36 @@ class PepakAuthUI {
       </tr>`).join('');
   }
 
-  changeRole(accountId, newRole) {
-    const ok = window.pepakAuth?.updateRole(accountId, newRole);
+  async changeRole(accountId, newRole) {
+    const ok = await window.pepakAuth?.updateRole(accountId, newRole);
     if (ok) this.renderAdminPanel();
   }
 
-  deleteUser(accountId) {
+  async deleteUser(accountId) {
     if (!confirm('Hapus akun ini secara permanen?')) return;
-    const ok = window.pepakAuth?.deleteAccount(accountId);
+    const ok = await window.pepakAuth?.deleteAccount(accountId);
     if (ok) this.renderAdminPanel();
   }
 
   /* ══════════════════════════════════════════════════════════════════════
      ADMIN PANEL — PERSETUJUAN AKUN PENDING
   ══════════════════════════════════════════════════════════════════════ */
-  renderApprovalPanel() {
+  async renderApprovalPanel() {
     if (!window.pepakAuth?.isAdmin()) return;
 
-    const pending  = window.pepakAuth.getPendingAccounts();
-    const rejected = window.pepakAuth.getRejectedAccounts();
-    const tbody    = document.getElementById('admin-approvals-tbody');
+    const tbody = document.getElementById('admin-approvals-tbody');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="padding:2rem;text-align:center;color:#8E7A68;">⏳ Memuat data...</td></tr>`;
+
+    const pending  = await window.pepakAuth.getPendingAccounts();
+    const rejected = await window.pepakAuth.getRejectedAccounts();
+
     if (!tbody) return;
 
     /* Update badge */
     this._updatePendingBadge();
 
     if (pending.length === 0 && rejected.length === 0) {
-      tbody.innerHTML = `
-        <tr><td colspan="5" style="padding:2rem;text-align:center;color:#8E7A68;">
-          ✅ Tidak ada pendaftar yang menunggu persetujuan.
-        </td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="padding:2rem;text-align:center;color:#8E7A68;">✅ Tidak ada pendaftar yang menunggu persetujuan.</td></tr>`;
       return;
     }
 
@@ -801,7 +808,7 @@ class PepakAuthUI {
         <td style="font-weight:700;color:#F0E6D2;">${acc.name}</td>
         <td style="color:#C8B89E;">${acc.email}</td>
         <td><span class="auth-nav-role-badge ${acc.role==='guru'?'guru':''}">${acc.role.toUpperCase()}</span></td>
-        <td style="color:#8E7A68;font-size:0.84rem;">${acc.createdAt}</td>
+        <td style="color:#8E7A68;font-size:0.84rem;">${(acc.created_at||'').split('T')[0]}</td>
         <td style="display:flex;gap:0.5rem;flex-wrap:wrap;">
           <button onclick="window.pepakAuthUI.approveAccount('${acc.id}')"
             style="background:rgba(46,196,182,0.15);border:1px solid rgba(46,196,182,0.4);
@@ -819,7 +826,7 @@ class PepakAuthUI {
         <td style="color:#8E7A68;">${acc.name}</td>
         <td style="color:#8E7A68;">${acc.email}</td>
         <td><span class="auth-nav-role-badge ${acc.role==='guru'?'guru':''}">${acc.role.toUpperCase()}</span></td>
-        <td style="color:#8E7A68;font-size:0.84rem;">${acc.createdAt}</td>
+        <td style="color:#8E7A68;font-size:0.84rem;">${(acc.created_at||'').split('T')[0]}</td>
         <td style="display:flex;gap:0.5rem;flex-wrap:wrap;">
           <span style="font-size:0.72rem;font-weight:800;background:rgba(230,57,70,0.15);
             color:#E63946;padding:0.15rem 0.55rem;border-radius:6px;">DITOLAK</span>
@@ -837,10 +844,9 @@ class PepakAuthUI {
       </td></tr>` + rejectedRows : '');
   }
 
-  approveAccount(accountId) {
-    const result = window.pepakAuth?.approveAccount(accountId);
+  async approveAccount(accountId) {
+    const result = await window.pepakAuth?.approveAccount(accountId);
     if (result?.ok) {
-      /* Hapus baris dari tabel dengan animasi */
       const row = document.getElementById(`approval-row-${accountId}`);
       if (row) {
         row.style.transition = 'opacity 0.3s ease';
@@ -855,9 +861,9 @@ class PepakAuthUI {
     }
   }
 
-  rejectAccount(accountId) {
+  async rejectAccount(accountId) {
     if (!confirm('Tolak pendaftaran ini? Pengguna tidak akan bisa login.')) return;
-    const result = window.pepakAuth?.rejectAccount(accountId);
+    const result = await window.pepakAuth?.rejectAccount(accountId);
     if (result?.ok) {
       this.renderApprovalPanel();
       this._showToast('Pendaftaran ditolak.', '#FF9E00');
@@ -867,15 +873,31 @@ class PepakAuthUI {
   /* ══════════════════════════════════════════════════════════════════════
      BADGE PENDING DI TAB
   ══════════════════════════════════════════════════════════════════════ */
-  _updatePendingBadge() {
-    const count = window.pepakAuth?.getPendingCount() || 0;
+  async _updatePendingBadge() {
+    const count = await window.pepakAuth?.getPendingCount() || 0;
     const badge = document.getElementById('admin-pending-badge');
     if (!badge) return;
     if (count > 0) {
       badge.style.display = 'flex';
-      badge.textContent   = count > 9 ? '9+' : count;
+      badge.textContent   = count > 9 ? '9+' : String(count);
     } else {
       badge.style.display = 'none';
+    }
+  }
+
+  /* Tab switch admin */
+  showAdminTab(tab) {
+    const usersPanel    = document.getElementById('admin-panel-users');
+    const approvalPanel = document.getElementById('admin-panel-approvals');
+    if (!usersPanel || !approvalPanel) return;
+    if (tab === 'users') {
+      usersPanel.style.display    = '';
+      approvalPanel.style.display = 'none';
+      this.renderAdminPanel();
+    } else {
+      usersPanel.style.display    = 'none';
+      approvalPanel.style.display = '';
+      this.renderApprovalPanel();
     }
   }
 
