@@ -357,8 +357,14 @@
 }
 
 /* ==========================================================================
-   NAVBAR — USER SESSION SLOT
+   NAVBAR — DROPDOWN MENU USER
    ========================================================================== */
+.auth-nav-dropdown {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Tombol trigger — sama tampilannya dengan tombol user lama */
 .auth-nav-user {
   display: flex; align-items: center; gap: 0.45rem;
   background: rgba(42,27,16,0.8);
@@ -368,12 +374,24 @@
   cursor: pointer;
   transition: all 0.22s ease;
   flex-shrink: 0; min-height: 38px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
-.auth-nav-user:hover  { border-color: #D4A64C; background: rgba(212,166,76,0.12); }
+.auth-nav-user:hover,
+.auth-nav-user[aria-expanded="true"] {
+  border-color: #D4A64C;
+  background: rgba(212,166,76,0.12);
+}
 .auth-nav-avatar      { font-size: 1.1rem; line-height: 1; }
 .auth-nav-name        {
   font-size: 0.78rem; font-weight: 700; color: #F0E6D2;
   max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.auth-nav-chevron {
+  font-size: 0.65rem; color: #8E7A68; margin-left: 0.1rem;
+  transition: transform 0.2s ease;
+}
+.auth-nav-user[aria-expanded="true"] .auth-nav-chevron {
+  transform: rotate(180deg);
 }
 .auth-nav-role-badge {
   font-size: 0.6rem; font-weight: 800; letter-spacing: 0.4px;
@@ -383,6 +401,101 @@
 }
 .auth-nav-role-badge.guru  { background: rgba(58,134,255,0.18); color: #3A86FF; border-color: rgba(58,134,255,0.35); }
 .auth-nav-role-badge.admin { background: rgba(230,57,70,0.18);  color: #E63946; border-color: rgba(230,57,70,0.35); }
+
+/* Menu popup */
+.auth-nav-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 210px;
+  background: #1E1208;
+  border: 1.5px solid rgba(212,166,76,0.35);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.75), 0 0 0 1px rgba(212,166,76,0.06);
+  padding: 0.5rem;
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  transform-origin: top right;
+}
+.auth-nav-menu.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Header info dalam menu */
+.auth-nav-menu-header {
+  padding: 0.6rem 0.75rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+.auth-nav-menu-name {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #F0E6D2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.auth-nav-menu-email {
+  font-size: 0.72rem;
+  color: #8E7A68;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Divider */
+.auth-nav-menu-divider {
+  height: 1px;
+  background: rgba(212,166,76,0.12);
+  margin: 0.3rem 0;
+}
+
+/* Item menu */
+.auth-nav-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  padding: 0.6rem 0.75rem;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #C8B89E;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+  min-height: 40px;
+}
+.auth-nav-menu-item:hover {
+  background: rgba(212,166,76,0.1);
+  color: #F3E7C4;
+}
+.auth-nav-menu-item--danger {
+  color: #E63946;
+}
+.auth-nav-menu-item--danger:hover {
+  background: rgba(230,57,70,0.12);
+  color: #FF7B84;
+}
+
+/* Mobile: menu ke kiri jika terlalu mepet tepi kanan */
+@media (max-width: 480px) {
+  .auth-nav-menu {
+    right: auto;
+    left: 0;
+    min-width: 190px;
+  }
+  .auth-nav-name { max-width: 58px; }
+}
 
 /* ==========================================================================
    ADMIN PANEL

@@ -236,7 +236,7 @@ class PepakAuthUI {
   }
 
   /* ══════════════════════════════════════════════════════════════════════
-     NAVBAR SLOT
+     NAVBAR SLOT — dropdown dengan Profil, Ganti Sandi, Logout
   ══════════════════════════════════════════════════════════════════════ */
   _renderNavUserSlot(session) {
     const slot = document.getElementById('auth-nav-slot');
@@ -248,12 +248,211 @@ class PepakAuthUI {
                     : session.role === 'guru'  ? 'GURU' : 'SISWA';
 
     slot.innerHTML = `
-      <div class="auth-nav-user" title="Klik untuk keluar"
-           onclick="window.pepakAuthUI.logout()" aria-label="Logout ${session.name}">
-        <span class="auth-nav-avatar">${session.avatar || '🎭'}</span>
-        <span class="auth-nav-name">${session.name.split(' ')[0]}</span>
-        <span class="auth-nav-role-badge ${roleBadgeClass}">${roleLabel}</span>
+      <div class="auth-nav-dropdown" id="auth-nav-dropdown">
+
+        <!-- Tombol trigger -->
+        <button class="auth-nav-user" id="auth-nav-trigger"
+          onclick="window.pepakAuthUI.toggleNavDropdown(event)"
+          aria-haspopup="true" aria-expanded="false"
+          aria-label="Menu akun ${session.name}">
+          <span class="auth-nav-avatar">${session.avatar || '🎭'}</span>
+          <span class="auth-nav-name">${session.name.split(' ')[0]}</span>
+          <span class="auth-nav-role-badge ${roleBadgeClass}">${roleLabel}</span>
+          <span class="auth-nav-chevron">▾</span>
+        </button>
+
+        <!-- Menu dropdown -->
+        <div class="auth-nav-menu" id="auth-nav-menu" role="menu">
+          <div class="auth-nav-menu-header">
+            <span class="auth-nav-menu-name">${session.name}</span>
+            <span class="auth-nav-menu-email">${session.email}</span>
+          </div>
+          <div class="auth-nav-menu-divider"></div>
+          <button class="auth-nav-menu-item" role="menuitem"
+            onclick="window.app?.navigateTo('profile'); window.pepakAuthUI.closeNavDropdown();">
+            <span>⚙️</span> Profil &amp; Akun
+          </button>
+          <button class="auth-nav-menu-item" role="menuitem"
+            onclick="window.pepakAuthUI.openChangePassword()">
+            <span>🔒</span> Ganti Kata Sandi
+          </button>
+          <div class="auth-nav-menu-divider"></div>
+          <button class="auth-nav-menu-item auth-nav-menu-item--danger" role="menuitem"
+            onclick="window.pepakAuthUI.logout()">
+            <span>🚪</span> Keluar (Logout)
+          </button>
+        </div>
+
       </div>`;
+  }
+
+  /* Toggle buka/tutup dropdown */
+  toggleNavDropdown(e) {
+    e.stopPropagation();
+    const menu    = document.getElementById('auth-nav-menu');
+    const trigger = document.getElementById('auth-nav-trigger');
+    if (!menu) return;
+    const isOpen = menu.classList.toggle('open');
+    if (trigger) trigger.setAttribute('aria-expanded', isOpen);
+    /* Tutup otomatis saat klik di luar */
+    if (isOpen) {
+      setTimeout(() => {
+        document.addEventListener('click', this._closeDropdownOutside, { once: true });
+      }, 10);
+    }
+  }
+
+  closeNavDropdown() {
+    const menu    = document.getElementById('auth-nav-menu');
+    const trigger = document.getElementById('auth-nav-trigger');
+    if (menu) menu.classList.remove('open');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  }
+
+  /* Handler klik luar dropdown */
+  _closeDropdownOutside = () => {
+    this.closeNavDropdown();
+  };
+
+  /* ── MODAL GANTI KATA SANDI ── */
+  openChangePassword() {
+    this.closeNavDropdown();
+
+    /* Hapus modal lama jika ada */
+    document.getElementById('auth-change-pw-modal')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'auth-change-pw-modal';
+    overlay.style.cssText = `
+      position:fixed;inset:0;background:rgba(0,0,0,0.82);
+      backdrop-filter:blur(8px);z-index:9000;
+      display:flex;align-items:center;justify-content:center;padding:1rem;`;
+
+    overlay.innerHTML = `
+      <div style="background:linear-gradient(160deg,#2A1B10,#1A0F08);
+        border:1.5px solid rgba(212,166,76,0.42);border-radius:20px;
+        max-width:400px;width:100%;padding:1.8rem;
+        box-shadow:0 30px 70px rgba(0,0,0,0.85);position:relative;
+        animation:authSlideIn 0.28s cubic-bezier(0.2,0.8,0.2,1);">
+
+        <button onclick="document.getElementById('auth-change-pw-modal').remove()"
+          style="position:absolute;top:0.9rem;right:0.9rem;width:34px;height:34px;
+          border-radius:50%;background:rgba(42,27,16,0.8);border:1px solid rgba(212,166,76,0.22);
+          color:#C8B89E;font-size:0.95rem;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;">✕</button>
+
+        <h3 style="font-family:'Cinzel',serif;font-size:1.1rem;color:#D4A64C;
+          margin-bottom:0.4rem;">🔒 Ganti Kata Sandi</h3>
+        <p style="font-size:0.8rem;color:#8E7A68;margin-bottom:1.3rem;">
+          Masukkan kata sandi lama dan kata sandi baru Anda.
+        </p>
+
+        <div id="cpw-msg" style="display:none;font-size:0.82rem;font-weight:600;
+          padding:0.6rem 0.9rem;border-radius:10px;margin-bottom:0.9rem;"></div>
+
+        <form onsubmit="window.pepakAuthUI.submitChangePassword(event)"
+          style="display:flex;flex-direction:column;gap:0.9rem;">
+
+          <div style="display:flex;flex-direction:column;gap:0.3rem;">
+            <label style="font-size:0.77rem;font-weight:700;color:#C8B89E;">Kata Sandi Lama</label>
+            <div style="position:relative;">
+              <input id="cpw-old" type="password" required
+                placeholder="Kata sandi saat ini"
+                style="width:100%;background:rgba(10,6,3,0.75);border:1.5px solid rgba(212,166,76,0.2);
+                border-radius:11px;padding:0.7rem 2.8rem 0.7rem 1rem;color:#F0E6D2;
+                font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;outline:none;
+                min-height:46px;box-sizing:border-box;" />
+              <button type="button" onclick="window.pepakAuthUI.togglePw('cpw-old',this)"
+                style="position:absolute;right:0.8rem;top:50%;transform:translateY(-50%);
+                background:none;border:none;color:#8E7A68;cursor:pointer;font-size:0.95rem;">👁</button>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:0.3rem;">
+            <label style="font-size:0.77rem;font-weight:700;color:#C8B89E;">Kata Sandi Baru (min. 6 karakter)</label>
+            <div style="position:relative;">
+              <input id="cpw-new" type="password" required minlength="6"
+                placeholder="Kata sandi baru"
+                style="width:100%;background:rgba(10,6,3,0.75);border:1.5px solid rgba(212,166,76,0.2);
+                border-radius:11px;padding:0.7rem 2.8rem 0.7rem 1rem;color:#F0E6D2;
+                font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;outline:none;
+                min-height:46px;box-sizing:border-box;" />
+              <button type="button" onclick="window.pepakAuthUI.togglePw('cpw-new',this)"
+                style="position:absolute;right:0.8rem;top:50%;transform:translateY(-50%);
+                background:none;border:none;color:#8E7A68;cursor:pointer;font-size:0.95rem;">👁</button>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:0.3rem;">
+            <label style="font-size:0.77rem;font-weight:700;color:#C8B89E;">Konfirmasi Kata Sandi Baru</label>
+            <input id="cpw-confirm" type="password" required minlength="6"
+              placeholder="Ulangi kata sandi baru"
+              style="width:100%;background:rgba(10,6,3,0.75);border:1.5px solid rgba(212,166,76,0.2);
+              border-radius:11px;padding:0.7rem 1rem;color:#F0E6D2;
+              font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;outline:none;
+              min-height:46px;box-sizing:border-box;" />
+          </div>
+
+          <button type="submit" id="cpw-btn"
+            style="background:linear-gradient(135deg,#F3E7C4,#D4A64C,#A67C2E);color:#1A0F08;
+            font-weight:800;font-size:0.95rem;padding:0.82rem;min-height:50px;
+            border:none;border-radius:11px;cursor:pointer;
+            box-shadow:0 4px 16px rgba(212,166,76,0.32);transition:all 0.2s ease;">
+            🔒 Simpan Kata Sandi Baru
+          </button>
+        </form>
+      </div>`;
+
+    /* Tutup dengan klik luar */
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.remove();
+    });
+
+    document.body.appendChild(overlay);
+  }
+
+  submitChangePassword(e) {
+    e.preventDefault();
+    const oldPw   = document.getElementById('cpw-old')?.value;
+    const newPw   = document.getElementById('cpw-new')?.value;
+    const confirm = document.getElementById('cpw-confirm')?.value;
+    const btn     = document.getElementById('cpw-btn');
+    const msgEl   = document.getElementById('cpw-msg');
+
+    const showMsg = (type, text) => {
+      const colors = {
+        error:   'rgba(230,57,70,0.14);color:#FF7B84;border:1px solid rgba(230,57,70,0.3)',
+        success: 'rgba(46,196,182,0.14);color:#2EC4B6;border:1px solid rgba(46,196,182,0.3)'
+      };
+      msgEl.style.cssText = `display:block;font-size:0.82rem;font-weight:600;
+        padding:0.6rem 0.9rem;border-radius:10px;margin-bottom:0.9rem;
+        background:${colors[type] || colors.error};`;
+      msgEl.textContent = text;
+    };
+
+    if (newPw !== confirm) {
+      showMsg('error', 'Konfirmasi kata sandi tidak cocok.');
+      return;
+    }
+    if (newPw.length < 6) {
+      showMsg('error', 'Kata sandi baru minimal 6 karakter.');
+      return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Menyimpan...'; }
+
+    setTimeout(() => {
+      const result = window.pepakAuth?.changePassword(oldPw, newPw);
+      if (!result?.ok) {
+        showMsg('error', result?.error || 'Gagal mengganti kata sandi.');
+        if (btn) { btn.disabled = false; btn.textContent = '🔒 Simpan Kata Sandi Baru'; }
+        return;
+      }
+
+      showMsg('success', '✅ Kata sandi berhasil diperbarui!');
+      if (btn) btn.textContent = '✅ Tersimpan';
+      setTimeout(() => document.getElementById('auth-change-pw-modal')?.remove(), 1500);
+    }, 350);
   }
 
   _clearNavUserSlot() {

@@ -309,6 +309,27 @@ class PepakAuth {
     return { ok: true };
   }
 
+  /** Ganti kata sandi akun yang sedang login */
+  changePassword(oldPassword, newPassword) {
+    const session = this._loadSession();
+    if (!session) return { ok: false, error: 'Sesi tidak ditemukan. Silakan login ulang.' };
+
+    const accounts = this._loadAccounts();
+    const acc = accounts.find(a => a.id === session.id);
+    if (!acc) return { ok: false, error: 'Akun tidak ditemukan.' };
+
+    if (acc.password !== oldPassword) {
+      return { ok: false, error: 'Kata sandi lama tidak sesuai.' };
+    }
+    if (newPassword.length < 6) {
+      return { ok: false, error: 'Kata sandi baru minimal 6 karakter.' };
+    }
+
+    acc.password = newPassword;
+    this._saveAccounts(accounts);
+    return { ok: true };
+  }
+
   /** Hapus akun (admin, tidak bisa hapus diri sendiri) */
   deleteAccount(accountId) {
     if (!this.isAdmin()) return false;
