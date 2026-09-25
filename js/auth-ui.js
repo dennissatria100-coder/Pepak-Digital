@@ -459,48 +459,33 @@ class PepakAuthUI {
     document.body.appendChild(overlay);
   }
 
-  submitChangePassword(e) {
+  async submitChangePassword(e) {
     e.preventDefault();
     const oldPw   = document.getElementById('cpw-old')?.value;
     const newPw   = document.getElementById('cpw-new')?.value;
     const confirm = document.getElementById('cpw-confirm')?.value;
     const btn     = document.getElementById('cpw-btn');
     const msgEl   = document.getElementById('cpw-msg');
-
     const showMsg = (type, text) => {
       const colors = {
         error:   'rgba(230,57,70,0.14);color:#FF7B84;border:1px solid rgba(230,57,70,0.3)',
         success: 'rgba(46,196,182,0.14);color:#2EC4B6;border:1px solid rgba(46,196,182,0.3)'
       };
-      msgEl.style.cssText = `display:block;font-size:0.82rem;font-weight:600;
-        padding:0.6rem 0.9rem;border-radius:10px;margin-bottom:0.9rem;
-        background:${colors[type] || colors.error};`;
+      msgEl.style.cssText = `display:block;font-size:0.82rem;font-weight:600;padding:0.6rem 0.9rem;border-radius:10px;margin-bottom:0.9rem;background:${colors[type]||colors.error};`;
       msgEl.textContent = text;
     };
-
-    if (newPw !== confirm) {
-      showMsg('error', 'Konfirmasi kata sandi tidak cocok.');
-      return;
-    }
-    if (newPw.length < 6) {
-      showMsg('error', 'Kata sandi baru minimal 6 karakter.');
-      return;
-    }
-
+    if (newPw !== confirm) { showMsg('error','Konfirmasi kata sandi tidak cocok.'); return; }
+    if (newPw.length < 6)  { showMsg('error','Kata sandi baru minimal 6 karakter.'); return; }
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Menyimpan...'; }
-
-    setTimeout(() => {
-      const result = window.pepakAuth?.changePassword(oldPw, newPw);
-      if (!result?.ok) {
-        showMsg('error', result?.error || 'Gagal mengganti kata sandi.');
-        if (btn) { btn.disabled = false; btn.textContent = '🔒 Simpan Kata Sandi Baru'; }
-        return;
-      }
-
-      showMsg('success', '✅ Kata sandi berhasil diperbarui!');
-      if (btn) btn.textContent = '✅ Tersimpan';
-      setTimeout(() => document.getElementById('auth-change-pw-modal')?.remove(), 1500);
-    }, 350);
+    const result = await window.pepakAuth?.changePassword(oldPw, newPw);
+    if (!result?.ok) {
+      showMsg('error', result?.error || 'Gagal mengganti kata sandi.');
+      if (btn) { btn.disabled = false; btn.textContent = '🔒 Simpan Kata Sandi Baru'; }
+      return;
+    }
+    showMsg('success','✅ Kata sandi berhasil diperbarui!');
+    if (btn) btn.textContent = '✅ Tersimpan';
+    setTimeout(() => document.getElementById('auth-change-pw-modal')?.remove(), 1500);
   }
 
   _clearNavUserSlot() {
@@ -560,109 +545,89 @@ class PepakAuthUI {
 
     const result = await window.pepakAuth?.login(email, password);
 
-      if (!result?.ok) {
-        /* Pesan khusus untuk status pending & rejected */
-        if (result?.pendingApproval) {
-          this._setMsg('pending',
-            '⏳ ' + (result.error || 'Akun Anda masih menunggu persetujuan Admin.'));
-        } else if (result?.rejected) {
-          this._setMsg('rejected',
-            '❌ ' + (result.error || 'Pendaftaran Anda ditolak. Hubungi Admin.'));
-        } else {
-          this._setMsg('error', result?.error || 'Login gagal.');
-        }
-        if (btn) {
-          btn.disabled = false;
-          const labels = { siswa:'🚀 Masuk sebagai Siswa', guru:'👨‍🏫 Masuk sebagai Guru', admin:'🛡️ Masuk sebagai Admin' };
-          btn.textContent = labels[this._activeRole] || 'Masuk';
-        }
-        return;
+    if (!result?.ok) {
+      if (result?.pendingApproval) {
+        this._setMsg('pending', '⏳ ' + (result.error || 'Akun Anda masih menunggu persetujuan Admin.'));
+      } else if (result?.rejected) {
+        this._setMsg('rejected', '❌ ' + (result.error || 'Pendaftaran Anda ditolak. Hubungi Admin.'));
+      } else {
+        this._setMsg('error', result?.error || 'Login gagal.');
       }
-
-      /* Pastikan role card yang dipilih sesuai dengan akun */
-      if (result.session.role !== this._activeRole) {
-        const roleNames = { siswa:'Siswa', guru:'Guru', admin:'Admin' };
-        this._setMsg('error',
-          `Akun ini terdaftar sebagai ${roleNames[result.session.role]}, bukan ${roleNames[this._activeRole]}. Pilih peran yang sesuai.`
-        );
-        window.pepakAuth?.logout();
-        if (btn) {
-          btn.disabled = false;
-          const labels = { siswa:'🚀 Masuk sebagai Siswa', guru:'👨‍🏫 Masuk sebagai Guru', admin:'🛡️ Masuk sebagai Admin' };
-          btn.textContent = labels[this._activeRole] || 'Masuk';
-        }
-        return;
+      if (btn) {
+        btn.disabled = false;
+        const labels = { siswa:'🚀 Masuk sebagai Siswa', guru:'👨‍🏫 Masuk sebagai Guru', admin:'🛡️ Masuk sebagai Admin' };
+        btn.textContent = labels[this._activeRole] || 'Masuk';
       }
+      return;
+    }
 
-      this._setMsg('success', `Sugeng rawuh, ${result.session.name}! 🎉`);
-      setTimeout(() => this._enterApp(result.session, true), 600);
+    if (result.session.role !== this._activeRole) {
+      const roleNames = { siswa:'Siswa', guru:'Guru', admin:'Admin' };
+      this._setMsg('error', `Akun ini terdaftar sebagai ${roleNames[result.session.role]}, bukan ${roleNames[this._activeRole]}. Pilih peran yang sesuai.`);
+      window.pepakAuth?.logout();
+      if (btn) {
+        btn.disabled = false;
+        const labels = { siswa:'🚀 Masuk sebagai Siswa', guru:'👨‍🏫 Masuk sebagai Guru', admin:'🛡️ Masuk sebagai Admin' };
+        btn.textContent = labels[this._activeRole] || 'Masuk';
+      }
+      return;
+    }
 
-    }, 400);
+    this._setMsg('success', `Sugeng rawuh, ${result.session.name}! 🎉`);
+    setTimeout(() => this._enterApp(result.session, true), 600);
   }
 
   /* ══════════════════════════════════════════════════════════════════════
      SUBMIT REGISTER
   ══════════════════════════════════════════════════════════════════════ */
-  submitRegister(e) {
+  async submitRegister(e) {
     e.preventDefault();
-
     const name     = document.getElementById('gate-reg-name')?.value?.trim();
     const email    = document.getElementById('gate-reg-email')?.value?.trim();
     const password = document.getElementById('gate-reg-password')?.value;
     const role     = document.querySelector('input[name="gate-reg-role"]:checked')?.value || 'siswa';
     const btn      = document.getElementById('gate-reg-btn');
-
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Mendaftarkan...'; }
 
-    setTimeout(() => {
-      const result = window.pepakAuth?.register(name, email, password, role);
+    const result = await window.pepakAuth?.register(name, email, password, role);
 
-      if (!result?.ok) {
-        this._setMsg('error', result?.error || 'Pendaftaran gagal.');
-        if (btn) { btn.disabled = false; btn.textContent = '✨ Buat Akun Gratis'; }
-        return;
-      }
-
-      /* Akun pending — tampilkan pesan & JANGAN masuk ke app */
-      if (result.pendingApproval) {
-        const roleLabel = role === 'guru' ? 'Guru' : 'Admin';
-        this._setMsg('pending',
-          `✅ Pendaftaran berhasil, ${result.name}!\n\n` +
-          `Akun ${roleLabel} Anda sedang menunggu persetujuan Admin. ` +
-          `Anda akan dapat login setelah akun disetujui oleh Admin. ` +
-          `Silakan coba login kembali setelah mendapat konfirmasi.`
-        );
-        if (btn) { btn.disabled = false; btn.textContent = '✨ Buat Akun Gratis'; }
-        /* Kembali ke tab login agar user tidak bingung */
-        setTimeout(() => this.switchTab('login'), 3500);
-        return;
-      }
-
-      /* Siswa langsung masuk */
-      this._setMsg('success', `Akun berhasil dibuat! Selamat datang, ${result.session?.name}! 🎉`);
-      setTimeout(() => this._enterApp(result.session, true), 700);
-    }, 400);
+    if (!result?.ok) {
+      this._setMsg('error', result?.error || 'Pendaftaran gagal.');
+      if (btn) { btn.disabled = false; btn.textContent = '✨ Buat Akun Gratis'; }
+      return;
+    }
+    if (result.pendingApproval) {
+      const roleLabel = role === 'guru' ? 'Guru' : 'Admin';
+      this._setMsg('pending',
+        `✅ Pendaftaran berhasil, ${result.name}!\n\nAkun ${roleLabel} Anda sedang menunggu persetujuan Admin. Silakan coba login kembali setelah mendapat konfirmasi.`
+      );
+      if (btn) { btn.disabled = false; btn.textContent = '✨ Buat Akun Gratis'; }
+      setTimeout(() => this.switchTab('login'), 3500);
+      return;
+    }
+    this._setMsg('success', `Akun berhasil dibuat! Selamat datang, ${result.session?.name}! 🎉`);
+    setTimeout(() => this._enterApp(result.session, true), 700);
   }
 
   /* ══════════════════════════════════════════════════════════════════════
      LOGOUT
   ══════════════════════════════════════════════════════════════════════ */
-  logout() {
+  async logout() {
     window.pepakAuth?.logout();
     window.pepakState?.setRole('siswa');
-
     const adminBtn = document.getElementById('nav-admin-btn');
     if (adminBtn) adminBtn.style.display = 'none';
-
     this._clearNavUserSlot();
     this._lockApp();
-
-    if (window.pepakAuth?.needsBootstrap()) {
-      this._showBootstrapForm();
-    } else {
+    this._showLoadingGate();
+    try {
+      const needs = await window.pepakAuth?.needsBootstrap();
+      this._hideLoadingGate();
+      needs ? this._showBootstrapForm() : this._showGate();
+    } catch(e) {
+      this._hideLoadingGate();
       this._showGate();
     }
-
     const emailInput = document.getElementById('gate-email');
     const passInput  = document.getElementById('gate-password');
     if (emailInput) emailInput.value = '';
