@@ -1,0 +1,423 @@
+/* ==========================================================================
+   PEPAK DIGITAL — AUTH GATE CSS
+   Scope : semua selector diawali #pepak-login-gate atau .auth- / .gate- / .admin-
+           Tidak menyentuh satu pun class/ID yang sudah ada.
+   ========================================================================== */
+
+/* ── GATE FULLSCREEN ─────────────────────────────────────────────────────── */
+#pepak-login-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background:
+    radial-gradient(ellipse at 60% 10%, rgba(212,166,76,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 15% 85%, rgba(212,166,76,0.07) 0%, transparent 50%),
+    linear-gradient(160deg, #1A0F08 0%, #0D0704 100%);
+  display: none;          /* dikelola JS */
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+
+  /* Batik kawung halus */
+  background-image:
+    radial-gradient(ellipse at 60% 10%, rgba(212,166,76,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 15% 85%, rgba(212,166,76,0.07) 0%, transparent 50%),
+    linear-gradient(160deg, #1A0F08 0%, #0D0704 100%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23D4A64C' fill-opacity='0.03'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20S-10 18.954-10 30s8.954 20 20 20 20-8.954 20-20zm0 0c0 11.046 8.954 20 20 20s20-8.954 20-20-8.954-20-20-20-20 8.954-20 20z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#pepak-login-gate.gate-visible  { opacity: 1; }
+#pepak-login-gate.gate-hiding   { opacity: 0; pointer-events: none; }
+
+/* ── CARD ────────────────────────────────────────────────────────────────── */
+.gate-card {
+  background: linear-gradient(160deg, #2C1D10 0%, #1A0F08 100%);
+  border: 1.5px solid rgba(212,166,76,0.38);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  padding: 2.4rem 2rem 2.2rem;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.88),
+    0 0 0 1px rgba(212,166,76,0.08),
+    inset 0 1px 0 rgba(212,166,76,0.12);
+  animation: gateSlideUp 0.38s cubic-bezier(0.2,0.8,0.2,1) both;
+  position: relative;
+}
+
+@keyframes gateSlideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Ornamen sudut emas */
+.gate-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 24px; right: 24px; height: 3px;
+  background: linear-gradient(90deg, transparent, #D4A64C 30%, #F3E7C4 50%, #D4A64C 70%, transparent);
+  border-radius: 9999px;
+}
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+.gate-header {
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+.gate-logo-wrap {
+  width: 70px; height: 70px;
+  background: linear-gradient(135deg, #4A3018, #2A1B10);
+  border: 2px solid #D4A64C;
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1rem;
+  box-shadow: 0 6px 20px rgba(212,166,76,0.3), 0 0 40px rgba(212,166,76,0.1);
+}
+.gate-title {
+  font-family: 'Cinzel','Playfair Display',serif;
+  font-size: clamp(1.35rem, 4vw, 1.65rem);
+  font-weight: 900;
+  color: #D4A64C;
+  letter-spacing: 1.5px;
+  line-height: 1.15;
+  margin-bottom: 0.3rem;
+}
+.gate-subtitle {
+  font-size: 0.82rem;
+  color: #8E7A68;
+  letter-spacing: 0.3px;
+}
+
+/* ── ROLE SELECTOR ───────────────────────────────────────────────────────── */
+.gate-role-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #C8B89E;
+  letter-spacing: 0.8px;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.gate-roles {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 0.65rem;
+  margin-bottom: 1.6rem;
+}
+
+.gate-role-card {
+  background: rgba(13,7,4,0.7);
+  border: 1.5px solid rgba(212,166,76,0.18);
+  border-radius: 14px;
+  padding: 0.9rem 0.4rem 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  user-select: none;
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+}
+.gate-role-card:hover {
+  border-color: rgba(212,166,76,0.45);
+  background: rgba(212,166,76,0.07);
+  transform: translateY(-2px);
+}
+.gate-role-card.active {
+  border-color: #D4A64C;
+  background: rgba(212,166,76,0.15);
+  box-shadow: 0 0 0 3px rgba(212,166,76,0.15), 0 6px 18px rgba(0,0,0,0.4);
+  transform: translateY(-3px);
+}
+.gate-role-card.active .gate-role-icon   { transform: scale(1.18); }
+.gate-role-card.active .gate-role-name   { color: #F3E7C4; }
+
+.gate-role-icon  { font-size: 1.7rem; transition: transform 0.22s ease; }
+.gate-role-name  {
+  font-size: 0.78rem; font-weight: 800;
+  color: #8E7A68; letter-spacing: 0.3px;
+  transition: color 0.22s ease;
+}
+.gate-role-desc  { font-size: 0.65rem; color: #4A3820; line-height: 1.3; }
+
+/* ── TAB BAR ─────────────────────────────────────────────────────────────── */
+.gate-tab-bar {
+  display: flex;
+  background: rgba(13,7,4,0.6);
+  border-radius: 9999px;
+  padding: 3px;
+  margin-bottom: 1.4rem;
+  border: 1px solid rgba(212,166,76,0.15);
+}
+.gate-tab-btn {
+  flex: 1;
+  background: transparent; border: none;
+  color: #8E7A68;
+  font-family: 'Plus Jakarta Sans',system-ui,sans-serif;
+  font-size: 0.88rem; font-weight: 700;
+  padding: 0.5rem; min-height: 40px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+.gate-tab-btn.active {
+  background: linear-gradient(135deg, #F3E7C4 0%, #D4A64C 50%, #A67C2E 100%);
+  color: #1A0F08;
+  box-shadow: 0 2px 10px rgba(212,166,76,0.35);
+}
+
+/* ── FORM ────────────────────────────────────────────────────────────────── */
+.gate-form  { display: flex; flex-direction: column; gap: 0.95rem; }
+
+.gate-field {
+  display: flex; flex-direction: column; gap: 0.32rem;
+}
+.gate-field-label {
+  font-size: 0.78rem; font-weight: 700;
+  color: #C8B89E; letter-spacing: 0.2px;
+}
+.gate-input {
+  width: 100%;
+  background: rgba(10,6,3,0.75);
+  border: 1.5px solid rgba(212,166,76,0.2);
+  border-radius: 12px;
+  padding: 0.72rem 1rem;
+  min-height: 48px;
+  color: #F0E6D2;
+  font-family: 'Plus Jakarta Sans',system-ui,sans-serif;
+  font-size: 0.92rem;
+  outline: none;
+  transition: all 0.22s ease;
+}
+.gate-input:focus {
+  border-color: #D4A64C;
+  background: rgba(10,6,3,0.95);
+  box-shadow: 0 0 0 3px rgba(212,166,76,0.12);
+}
+.gate-input::placeholder { color: #3A2810; }
+
+/* Password wrapper */
+.gate-pw-wrap { position: relative; }
+.gate-pw-wrap .gate-input { padding-right: 3rem; }
+.gate-pw-toggle {
+  position: absolute; right: 0.85rem; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  color: #8E7A68; font-size: 1rem;
+  cursor: pointer; padding: 0.3rem;
+  transition: color 0.18s ease;
+}
+.gate-pw-toggle:hover { color: #D4A64C; }
+
+/* Role register pills */
+.gate-reg-roles {
+  display: flex; gap: 0.65rem; flex-wrap: wrap;
+}
+.gate-reg-role-pill {
+  flex: 1; min-width: 110px;
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  background: rgba(10,6,3,0.7);
+  border: 1.5px solid rgba(212,166,76,0.2);
+  border-radius: 10px;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.83rem; font-weight: 700;
+  color: #8E7A68;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.gate-reg-role-pill input[type="radio"] { display: none; }
+.gate-reg-role-pill:has(input:checked) {
+  border-color: #D4A64C;
+  background: rgba(212,166,76,0.14);
+  color: #F3E7C4;
+}
+
+/* Pesan error/sukses */
+.auth-msg {
+  font-size: 0.82rem; font-weight: 600;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  display: none;
+  line-height: 1.4;
+}
+.auth-msg.error   {
+  background: rgba(230,57,70,0.14);
+  color: #FF7B84;
+  border: 1px solid rgba(230,57,70,0.3);
+  display: block;
+}
+.auth-msg.success {
+  background: rgba(46,196,182,0.14);
+  color: #2EC4B6;
+  border: 1px solid rgba(46,196,182,0.3);
+  display: block;
+}
+
+/* Submit button */
+.gate-submit-btn {
+  background: linear-gradient(135deg, #F3E7C4 0%, #D4A64C 50%, #A67C2E 100%);
+  color: #1A0F08;
+  font-family: 'Plus Jakarta Sans',system-ui,sans-serif;
+  font-weight: 800; font-size: 0.98rem;
+  padding: 0.88rem; min-height: 52px;
+  border: none; border-radius: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  box-shadow: 0 4px 18px rgba(212,166,76,0.38);
+  transition: all 0.22s ease;
+  margin-top: 0.2rem;
+  width: 100%;
+}
+.gate-submit-btn:hover  { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(212,166,76,0.52); filter: brightness(1.07); }
+.gate-submit-btn:active { transform: translateY(1px); }
+.gate-submit-btn:disabled { opacity: 0.52; cursor: not-allowed; transform: none; }
+
+/* ── DEMO CREDENTIALS ────────────────────────────────────────────────────── */
+.gate-demo {
+  margin-top: 1.3rem;
+  background: rgba(42,27,16,0.55);
+  border: 1px dashed rgba(212,166,76,0.22);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.gate-demo-title {
+  font-size: 0.7rem; font-weight: 800;
+  color: #D4A64C; letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+}
+.gate-demo-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid rgba(212,166,76,0.07);
+  font-size: 0.76rem; color: #8E7A68;
+}
+.gate-demo-row:last-child { border-bottom: none; }
+.gate-demo-row code {
+  background: rgba(212,166,76,0.1);
+  color: #D4A64C;
+  padding: 0.1rem 0.4rem;
+  border-radius: 5px;
+  font-family: monospace; font-size: 0.73rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: block;
+}
+.gate-demo-row code:hover { background: rgba(212,166,76,0.22); }
+
+.gate-role-pill-mini {
+  font-size: 0.63rem; font-weight: 800;
+  padding: 0.12rem 0.42rem;
+  border-radius: 9999px;
+  background: rgba(212,166,76,0.18); color: #D4A64C;
+  border: 1px solid rgba(212,166,76,0.35);
+  text-align: center; white-space: nowrap;
+}
+.gate-role-pill-mini.guru  { background: rgba(58,134,255,0.18); color: #3A86FF; border-color: rgba(58,134,255,0.4); }
+.gate-role-pill-mini.admin { background: rgba(230,57,70,0.18);  color: #E63946; border-color: rgba(230,57,70,0.4); }
+
+/* ── DIVIDER & FOOTER LINK ───────────────────────────────────────────────── */
+.gate-divider {
+  display: flex; align-items: center; gap: 0.75rem;
+  color: #3A2810; font-size: 0.73rem; margin: 0.5rem 0;
+}
+.gate-divider::before, .gate-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(212,166,76,0.13);
+}
+
+.gate-footer-note {
+  text-align: center;
+  font-size: 0.8rem; color: #8E7A68;
+  margin-top: 1rem;
+}
+.gate-footer-note span {
+  color: #D4A64C; font-weight: 700; font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   NAVBAR — USER SESSION SLOT
+   ========================================================================== */
+.auth-nav-user {
+  display: flex; align-items: center; gap: 0.45rem;
+  background: rgba(42,27,16,0.8);
+  border: 1px solid rgba(212,166,76,0.3);
+  border-radius: 9999px;
+  padding: 0.28rem 0.7rem 0.28rem 0.4rem;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  flex-shrink: 0; min-height: 38px;
+}
+.auth-nav-user:hover  { border-color: #D4A64C; background: rgba(212,166,76,0.12); }
+.auth-nav-avatar      { font-size: 1.1rem; line-height: 1; }
+.auth-nav-name        {
+  font-size: 0.78rem; font-weight: 700; color: #F0E6D2;
+  max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.auth-nav-role-badge {
+  font-size: 0.6rem; font-weight: 800; letter-spacing: 0.4px;
+  padding: 0.1rem 0.42rem; border-radius: 9999px;
+  background: rgba(212,166,76,0.18); color: #D4A64C;
+  border: 1px solid rgba(212,166,76,0.35);
+}
+.auth-nav-role-badge.guru  { background: rgba(58,134,255,0.18); color: #3A86FF; border-color: rgba(58,134,255,0.35); }
+.auth-nav-role-badge.admin { background: rgba(230,57,70,0.18);  color: #E63946; border-color: rgba(230,57,70,0.35); }
+
+/* ==========================================================================
+   ADMIN PANEL
+   ========================================================================== */
+.admin-page-layout {
+  max-width: 1100px;
+  margin: 1.5rem auto 5rem;
+  padding: 0 1rem;
+}
+.admin-page-header {
+  background: linear-gradient(135deg, rgba(230,57,70,0.13) 0%, rgba(42,27,16,0.9) 100%);
+  border: 1.5px solid rgba(230,57,70,0.38);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+}
+.admin-badge-icon  { font-size: 2.4rem; }
+.admin-page-title  { font-family: 'Cinzel','Playfair Display',serif; font-size: clamp(1.3rem,3.5vw,1.9rem); color: #E63946; margin-bottom: 0.2rem; }
+.admin-page-sub    { color: #8E7A68; font-size: 0.86rem; }
+.admin-stats-row   { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 2rem; }
+.admin-stat-card   { background: #2A1B10; border: 1px solid rgba(212,166,76,0.22); border-radius: 14px; padding: 1.2rem 1rem; text-align: center; transition: all 0.22s ease; }
+.admin-stat-card:hover { border-color: #D4A64C; transform: translateY(-2px); }
+.admin-stat-num    { font-family: 'Cinzel',serif; font-size: 2rem; font-weight: 900; color: #D4A64C; display: block; }
+.admin-stat-lbl    { font-size: 0.77rem; color: #8E7A68; font-weight: 600; }
+.admin-table-card  { background: #2A1B10; border: 1px solid rgba(212,166,76,0.22); border-radius: 18px; overflow: hidden; }
+.admin-table-topbar{ display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.4rem; border-bottom: 1px solid rgba(212,166,76,0.12); flex-wrap: wrap; gap: 0.8rem; }
+.admin-table-title { font-family: 'Cinzel',serif; font-size: 1.05rem; color: #F3E7C4; }
+.admin-users-table { width: 100%; border-collapse: collapse; min-width: 520px; }
+.admin-users-table th { background: rgba(13,7,4,0.85); padding: 0.8rem 1rem; text-align: left; font-size: 0.73rem; color: #D4A64C; text-transform: uppercase; letter-spacing: 0.5px; }
+.admin-users-table td { padding: 0.85rem 1rem; font-size: 0.87rem; border-bottom: 1px solid rgba(212,166,76,0.06); color: #C8B89E; }
+.admin-users-table tr:hover td { background: rgba(212,166,76,0.04); }
+.admin-role-select { background: rgba(13,7,4,0.8); border: 1px solid rgba(212,166,76,0.28); color: #F0E6D2; border-radius: 8px; padding: 0.3rem 0.65rem; font-size: 0.82rem; cursor: pointer; outline: none; }
+.admin-role-select:focus { border-color: #D4A64C; }
+.admin-del-btn { background: rgba(230,57,70,0.13); border: 1px solid rgba(230,57,70,0.32); color: #E63946; font-size: 0.77rem; font-weight: 700; padding: 0.3rem 0.65rem; border-radius: 8px; cursor: pointer; transition: all 0.18s ease; }
+.admin-del-btn:hover { background: rgba(230,57,70,0.28); }
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 480px) {
+  .gate-card    { padding: 1.8rem 1.2rem 1.6rem; border-radius: 18px; }
+  .gate-roles   { gap: 0.5rem; }
+  .gate-role-card { padding: 0.75rem 0.3rem; }
+  .gate-role-icon { font-size: 1.45rem; }
+  .gate-role-name { font-size: 0.72rem; }
+  .gate-role-desc { display: none; }
+  .gate-demo-row  { grid-template-columns: 48px 1fr 1fr; }
+  .admin-stats-row { grid-template-columns: 1fr 1fr; }
+  .auth-nav-name  { max-width: 58px; }
+}

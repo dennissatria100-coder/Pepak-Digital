@@ -6,7 +6,7 @@
 class PepakApp {
   constructor() {
     this.currentView = "home";
-    this.views = ["home", "characters", "pepak", "arena", "leaderboard", "dictionary", "profile", "pricing", "checkout", "teacher"];
+    this.views = ["home", "characters", "pepak", "arena", "leaderboard", "dictionary", "profile", "pricing", "checkout", "teacher", "admin"];
   }
 
   init() {
@@ -91,6 +91,8 @@ class PepakApp {
       this.renderLeaderboard();
     } else if (viewName === "profile") {
       this.renderProfile();
+    } else if (viewName === "admin") {
+      window.pepakAuthUI?.renderAdminPanel();
     }
   }
 

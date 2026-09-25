@@ -21,18 +21,197 @@
   <link rel="stylesheet" href="css/pricing-payment.css">
   <link rel="stylesheet" href="css/expanded-learning.css">
   <link rel="stylesheet" href="css/youtube-video.css">
+  <link rel="stylesheet" href="css/auth.css">
 </head>
 
 <body>
 
+  <!-- ════════════════════════════════════════════════════════════════════════
+       LOGIN GATE — tampil paling awal, memblokir konten sampai login berhasil
+       Dikelola sepenuhnya oleh js/auth-ui.js & js/auth.js
+       ════════════════════════════════════════════════════════════════════════ -->
+  <div id="pepak-login-gate" role="dialog" aria-modal="true" aria-label="Login Pepak Digital">
+    <div class="gate-card">
+
+      <!-- Header -->
+      <div class="gate-header">
+        <div class="gate-logo-wrap">🎭</div>
+        <div class="gate-title">PEPAK DIGITAL</div>
+        <div class="gate-subtitle">Platform Pembelajaran Bahasa Jawa Krama Alus & Wayang</div>
+      </div>
+
+      <!-- Pilih Peran -->
+      <div class="gate-role-label">Pilih peran Anda untuk masuk</div>
+      <div class="gate-roles">
+        <div class="gate-role-card active" id="gate-role-siswa"
+             onclick="window.pepakAuthUI?.selectRole('siswa')" role="button" tabindex="0"
+             onkeypress="if(event.key==='Enter')window.pepakAuthUI?.selectRole('siswa')">
+          <span class="gate-role-icon">🎒</span>
+          <span class="gate-role-name">Siswa</span>
+          <span class="gate-role-desc">Belajar mandiri</span>
+        </div>
+        <div class="gate-role-card" id="gate-role-guru"
+             onclick="window.pepakAuthUI?.selectRole('guru')" role="button" tabindex="0"
+             onkeypress="if(event.key==='Enter')window.pepakAuthUI?.selectRole('guru')">
+          <span class="gate-role-icon">👨‍�</span>
+          <span class="gate-role-name">Guru</span>
+          <span class="gate-role-desc">Dashboard kelas</span>
+        </div>
+        <div class="gate-role-card" id="gate-role-admin"
+             onclick="window.pepakAuthUI?.selectRole('admin')" role="button" tabindex="0"
+             onkeypress="if(event.key==='Enter')window.pepakAuthUI?.selectRole('admin')">
+          <span class="gate-role-icon">🛡️</span>
+          <span class="gate-role-name">Admin</span>
+          <span class="gate-role-desc">Panel pengelola</span>
+        </div>
+      </div>
+
+      <!-- Tab Login / Daftar -->
+      <div class="gate-tab-bar" role="tablist">
+        <button class="gate-tab-btn active" id="gate-tab-login" role="tab"
+          onclick="window.pepakAuthUI?.switchTab('login')">🔑 Masuk</button>
+        <button class="gate-tab-btn" id="gate-tab-register" role="tab"
+          onclick="window.pepakAuthUI?.switchTab('register')">✨ Daftar</button>
+      </div>
+
+      <!-- Pesan error / sukses -->
+      <div class="auth-msg" id="gate-message"></div>
+
+      <!-- ── FORM LOGIN ── -->
+      <form class="gate-form" id="gate-form-login"
+            onsubmit="window.pepakAuthUI?.submitLogin(event)">
+
+        <div class="gate-field">
+          <label class="gate-field-label" for="gate-email">📧 Email</label>
+          <input class="gate-input" id="gate-email" type="email"
+            placeholder="siswa@pepak.edu" autocomplete="email" required />
+        </div>
+
+        <div class="gate-field">
+          <label class="gate-field-label" for="gate-password">🔒 Kata Sandi</label>
+          <div class="gate-pw-wrap">
+            <input class="gate-input" id="gate-password" type="password"
+              placeholder="siswa123" autocomplete="current-password" required />
+            <button type="button" class="gate-pw-toggle"
+              onclick="window.pepakAuthUI?.togglePw('gate-password',this)"
+              aria-label="Tampilkan kata sandi">👁</button>
+          </div>
+        </div>
+
+        <button type="submit" class="gate-submit-btn" id="gate-submit-btn">
+          🚀 Masuk sebagai Siswa
+        </button>
+      </form>
+
+      <!-- ── FORM DAFTAR ── -->
+      <form class="gate-form" id="gate-form-register" style="display:none;"
+            onsubmit="window.pepakAuthUI?.submitRegister(event)">
+
+        <div class="gate-field">
+          <label class="gate-field-label" for="gate-reg-name">👤 Nama Lengkap</label>
+          <input class="gate-input" id="gate-reg-name" type="text"
+            placeholder="Nama lengkap Anda" autocomplete="name" required />
+        </div>
+
+        <div class="gate-field">
+          <label class="gate-field-label" for="gate-reg-email">📧 Email</label>
+          <input class="gate-input" id="gate-reg-email" type="email"
+            placeholder="contoh@email.com" autocomplete="email" required />
+        </div>
+
+        <div class="gate-field">
+          <label class="gate-field-label" for="gate-reg-password">🔒 Kata Sandi (min. 6 karakter)</label>
+          <div class="gate-pw-wrap">
+            <input class="gate-input" id="gate-reg-password" type="password"
+              placeholder="Buat kata sandi" autocomplete="new-password" required minlength="6" />
+            <button type="button" class="gate-pw-toggle"
+              onclick="window.pepakAuthUI?.togglePw('gate-reg-password',this)"
+              aria-label="Tampilkan kata sandi">👁</button>
+          </div>
+        </div>
+
+        <div class="gate-field">
+          <label class="gate-field-label">🎭 Daftar sebagai</label>
+          <div class="gate-reg-roles">
+            <label class="gate-reg-role-pill">
+              <input type="radio" name="gate-reg-role" value="siswa" checked> 🎒 Siswa
+            </label>
+            <label class="gate-reg-role-pill">
+              <input type="radio" name="gate-reg-role" value="guru"> 👨‍🏫 Guru
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="gate-submit-btn" id="gate-reg-btn">
+          ✨ Buat Akun Gratis
+        </button>
+      </form>
+
+      <!-- Demo credentials -->
+      <div class="gate-divider">Akun Demo — Klik untuk Autofill</div>
+
+      <div class="gate-demo">
+        <div class="gate-demo-title">🧪 Coba Langsung Tanpa Registrasi</div>
+        <div class="gate-demo-row">
+          <span class="gate-role-pill-mini">SISWA</span>
+          <code onclick="window.pepakAuthUI?.fillDemo('siswa@pepak.edu','siswa123')" title="Klik autofill">siswa@pepak.edu</code>
+          <code onclick="window.pepakAuthUI?.fillDemo('siswa@pepak.edu','siswa123')" title="Klik autofill">siswa123</code>
+        </div>
+        <div class="gate-demo-row">
+          <span class="gate-role-pill-mini guru">GURU</span>
+          <code onclick="window.pepakAuthUI?.fillDemo('guru@pepak.edu','guru123')" title="Klik autofill">guru@pepak.edu</code>
+          <code onclick="window.pepakAuthUI?.fillDemo('guru@pepak.edu','guru123')" title="Klik autofill">guru123</code>
+        </div>
+        <div class="gate-demo-row">
+          <span class="gate-role-pill-mini admin">ADMIN</span>
+          <code onclick="window.pepakAuthUI?.fillDemo('admin@pepak.edu','admin123')" title="Klik autofill">admin@pepak.edu</code>
+          <code onclick="window.pepakAuthUI?.fillDemo('admin@pepak.edu','admin123')" title="Klik autofill">admin123</code>
+        </div>
+      </div>
+
+      <div class="gate-footer-note">
+        🔒 Data tersimpan lokal di perangkat Anda — aman & privat
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       APP WRAPPER — seluruh konten website terbungkus di sini.
+       Disembunyikan oleh JS sampai login berhasil.
+       ════════════════════════════════════════════════════════════════════════ -->
+  <div id="pepak-app-wrapper">
+
+  <!-- VIEW ADMIN PANEL (hanya role admin) -->
+  <section id="view-admin" class="spa-view-section">
+    <div class="admin-page-layout">
+      <div class="admin-page-header">
+        <span class="admin-badge-icon">🛡️</span>
+        <div>
+          <h2 class="admin-page-title">Panel Admin — Pepak Digital</h2>
+          <p class="admin-page-sub">Manajemen pengguna, role, dan data platform.</p>
+        </div>
+      </div>
+      <div class="admin-stats-row" id="admin-stats-row"></div>
+      <div class="admin-table-card">
+        <div class="admin-table-topbar">
+          <span class="admin-table-title">👥 Daftar Pengguna Terdaftar</span>
+          <button class="btn-outline-gold" style="padding:0.4rem 1rem;font-size:0.82rem;"
+            onclick="window.pepakAuthUI?.renderAdminPanel()">↻ Refresh</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-users-table">
+            <thead><tr><th>Avatar</th><th>Nama</th><th>Email</th><th>Role</th><th>Ubah Role</th><th>Aksi</th></tr></thead>
+            <tbody id="admin-users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ========================================================================
        TOP PROMO TRIAL STRIP (BANNER 7 HARI GRATIS)
        ======================================================================== -->
-  <div class="trial-banner-strip" onclick="window.app?.navigateTo('pricing')">
-    <span>✨ <strong>Promo Ksatria Emas:</strong> Coba 7 Hari Gratis Akses Penuh Seluruh 20 Unit, Tokoh Wayang & Nyawa
-      Tanpa Batas!</span>
-    <span class="btn-trial-pill">Coba Gratis 7 Hari ➔</span>
-  </div>
 
   <!-- ========================================================================
        TOP NAVIGATION BAR & HUD
@@ -148,8 +327,17 @@
           <button class="nav-link-btn" data-view="profile" onclick="window.app?.navigateTo('profile')">
             <span>⚙️</span> Profil & Akun
           </button>
+          <!-- Tombol Admin — hanya tampil jika role admin -->
+          <button class="nav-link-btn" id="nav-admin-btn" data-view="admin"
+            onclick="window.app?.navigateTo('admin')"
+            style="display:none; color:#E63946; border-color:rgba(230,57,70,0.4);">
+            <span>🛡️</span> Panel Admin
+          </button>
         </div>
       </nav>
+
+      <!-- Auth: Tombol Login / Info User (dinamis) -->
+      <div id="auth-nav-slot"></div>
 
       <!-- Mobile Hamburger Toggle -->
       <button class="mobile-toggle-btn" id="mobile-menu-toggle-btn" aria-label="Buka Menu">
@@ -1163,11 +1351,11 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="js/vocab-data.js"></script>
   <script src="js/question-bank.js"></script>
   <script src="js/data.js"></script>
   <script src="js/audio.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/state.js"></script>
   <script src="js/quiz.js"></script>
   <script src="js/characters.js"></script>
@@ -1175,6 +1363,11 @@
   <script src="js/payment.js"></script>
   <script src="js/teacher.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/auth-ui.js"></script>
+
+  </div><!-- /#pepak-app-wrapper -->
+</body>
+</html>
 </body>
 
 </html>
