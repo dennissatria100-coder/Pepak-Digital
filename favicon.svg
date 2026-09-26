@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#F3E7C4"/>
+      <stop offset="45%"  stop-color="#D4A64C"/>
+      <stop offset="100%" stop-color="#A67C2E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background hitam kehijauan -->
+  <rect width="200" height="220" rx="18" fill="#0D1F1A"/>
+
+  <!-- === GUNUNGAN / KERANGKA LUAR === -->
+  <!-- Bentuk kerangka luar topeng wayang (diamond/gunungan) -->
+  <path d="M100 8 L168 80 L168 155 Q168 200 100 212 Q32 200 32 155 L32 80 Z"
+        fill="none" stroke="url(#goldGrad)" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Ornamen ujung bawah -->
+  <path d="M82 210 Q100 222 118 210 L114 204 Q100 214 86 204 Z"
+        fill="url(#goldGrad)"/>
+
+  <!-- === MAHKOTA / PRABA === -->
+  <!-- Tombak tengah mahkota -->
+  <line x1="100" y1="8" x2="100" y2="62" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Segitiga mahkota kiri & kanan -->
+  <path d="M100 8 L77 45 L100 55 Z" fill="url(#goldGrad)" opacity="0.9"/>
+  <path d="M100 8 L123 45 L100 55 Z" fill="url(#goldGrad)" opacity="0.9"/>
+
+  <!-- Ornamen sulur mahkota kiri -->
+  <path d="M100 55 Q85 50 75 40 Q65 30 72 22 Q78 16 84 22 Q90 30 85 38 Q82 45 88 50"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Ornamen sulur mahkota kanan -->
+  <path d="M100 55 Q115 50 125 40 Q135 30 128 22 Q122 16 116 22 Q110 30 115 38 Q118 45 112 50"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.8" stroke-linecap="round"/>
+
+  <!-- === WAJAH TOPENG === -->
+  <!-- Bentuk wajah utama -->
+  <ellipse cx="100" cy="135" rx="52" ry="60" fill="url(#goldGrad)"/>
+
+  <!-- Bagian atas kepala / "iket" -->
+  <path d="M55 108 Q68 88 100 85 Q132 88 145 108 L148 118 Q132 100 100 98 Q68 100 52 118 Z"
+        fill="#0D1F1A"/>
+  <path d="M55 108 Q68 88 100 85 Q132 88 145 108"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.5"/>
+
+  <!-- Alis kiri -->
+  <path d="M72 118 Q80 112 90 114" fill="none" stroke="#0D1F1A" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Alis kanan -->
+  <path d="M128 118 Q120 112 110 114" fill="none" stroke="#0D1F1A" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Mata kiri (sipit) -->
+  <path d="M72 126 Q80 121 90 124 Q82 128 72 126 Z" fill="#0D1F1A"/>
+  <!-- Mata kanan (sipit) -->
+  <path d="M128 126 Q120 121 110 124 Q118 128 128 126 Z" fill="#0D1F1A"/>
+
+  <!-- Hidung -->
+  <path d="M96 132 Q100 128 104 132 Q101 140 100 140 Q99 140 96 132 Z" fill="#0D1F1A" opacity="0.6"/>
+
+  <!-- Bibir senyum -->
+  <path d="M86 154 Q100 165 114 154" fill="none" stroke="#0D1F1A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M86 154 Q100 158 114 154" fill="#0D1F1A" opacity="0.3"/>
+
+  <!-- === ORNAMEN SISI KIRI === -->
+  <path d="M48 130 Q36 125 34 115 Q32 105 40 100 Q48 96 52 104 Q55 112 48 118 Q44 124 48 130"
+        fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M48 148 Q34 145 32 135 Q31 128 38 126"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M48 130 Q40 138 42 148 Q44 158 52 158"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- === ORNAMEN SISI KANAN === -->
+  <path d="M152 130 Q164 125 166 115 Q168 105 160 100 Q152 96 148 104 Q145 112 152 118 Q156 124 152 130"
+        fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M152 148 Q166 145 168 135 Q169 128 162 126"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M152 130 Q160 138 158 148 Q156 158 148 158"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Dagu / leher -->
+  <path d="M72 180 Q82 195 100 198 Q118 195 128 180"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"/>
+</svg>
