@@ -526,11 +526,11 @@ h1, h2, h3, .serif-font {
 /* Silhouette Mask Watermarks */
 .hero-watermark-right {
   position: absolute;
-  right: -10%;
-  top: 5%;
-  width: 260px;
-  height: 260px;
-  opacity: 0.04;
+  right: -5%;
+  top: 0%;
+  width: 360px;
+  height: 360px;
+  opacity: 0.18;
   pointer-events: none;
   filter: drop-shadow(0 0 30px var(--gold-primary));
 }
@@ -1180,9 +1180,9 @@ h1, h2, h3, .serif-font {
   }
 
   .hero-watermark-right {
-    opacity: 0.08;
-    width: 380px;
-    height: 380px;
+    opacity: 0.20;
+    width: 420px;
+    height: 420px;
   }
 
   .hero-watermark-left {
