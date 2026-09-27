@@ -6,11 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pepak Digital — Platform Pembelajaran Interaktif Bahasa Jawa Halus & Wayang</title>
 
-  <!-- Favicon — Logo Topeng Wayang Emas Pepak Digital -->
-  <link rel="icon"             type="image/svg+xml"             href="favicon.svg">
-  <link rel="icon"             type="image/png" sizes="32x32"   href="favicon.svg">
-  <link rel="apple-touch-icon"                  sizes="180x180" href="favicon.svg">
-  <link rel="shortcut icon"    type="image/svg+xml"             href="favicon.svg">
+  <!-- Favicon — Logo Pepak Digital -->
+  <link rel="icon"             type="image/png"     href="logo.png">
+  <link rel="apple-touch-icon"                      href="logo.png">
+  <link rel="shortcut icon"    type="image/png"     href="logo.png">
 
   <!-- Meta & SEO Tags -->
   <meta name="description"
@@ -242,21 +241,25 @@
 
       <!-- Logo PepakNusa -->
       <a href="#home" class="brand-logo-link" onclick="window.app?.navigateTo('home')">
-        <div class="mask-logo-badge" title="PepakNusa Wayang Topeng">
-          <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 5 C10 5, 5 13, 5 24 C5 33, 12 37, 20 37 C28 37, 35 33, 35 24 C35 13, 30 5, 20 5 Z"
-              fill="url(#maskGrad)" stroke="#D4A64C" stroke-width="1.8" />
-            <ellipse cx="14" cy="20" rx="3.5" ry="2.2" fill="#3A86FF" stroke="#D4A64C" stroke-width="1" />
-            <ellipse cx="26" cy="20" rx="3.5" ry="2.2" fill="#E63946" stroke="#D4A64C" stroke-width="1" />
-            <path d="M20 21 L18.5 27 L21.5 27" stroke="#D4A64C" stroke-width="1.4" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M13 30 Q20 34 27 30" stroke="#D4A64C" stroke-width="1.5" stroke-linecap="round" fill="none" />
-            <circle cx="5" cy="24" r="1.5" fill="#D4A64C" />
-            <circle cx="35" cy="24" r="1.5" fill="#D4A64C" />
+        <div class="mask-logo-badge" title="Pepak Digital — Belajar Bahasa Jawa, Kenal Wayang">
+          <!-- Logo utama — simpan file logo.png di folder root project untuk mengganti -->
+          <img src="logo.png" alt="Pepak Digital Logo"
+               width="38" height="38"
+               style="object-fit:contain;border-radius:8px;"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <!-- Fallback SVG jika logo.png belum ada -->
+          <svg style="display:none;" width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 5 C10 5, 5 13, 5 24 C5 33, 12 37, 20 37 C28 37, 35 33, 35 24 C35 13, 30 5, 20 5 Z" fill="url(#maskGrad)" stroke="#D4A64C" stroke-width="1.8"/>
+            <ellipse cx="14" cy="20" rx="3.5" ry="2.2" fill="#3A86FF" stroke="#D4A64C" stroke-width="1"/>
+            <ellipse cx="26" cy="20" rx="3.5" ry="2.2" fill="#E63946" stroke="#D4A64C" stroke-width="1"/>
+            <path d="M20 21 L18.5 27 L21.5 27" stroke="#D4A64C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 30 Q20 34 27 30" stroke="#D4A64C" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <circle cx="5" cy="24" r="1.5" fill="#D4A64C"/>
+            <circle cx="35" cy="24" r="1.5" fill="#D4A64C"/>
             <defs>
               <linearGradient id="maskGrad" x1="5" y1="5" x2="35" y2="37" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#4A3018" />
-                <stop offset="1" stop-color="#22130A" />
+                <stop stop-color="#4A3018"/>
+                <stop offset="1" stop-color="#22130A"/>
               </linearGradient>
             </defs>
           </svg>
