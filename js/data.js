@@ -10,6 +10,8 @@ const PEPAK_DATA = {
       id: "arjuna",
       name: "Raden Arjuna",
       alias: "Janaka / Permadi",
+      /* ── GANTI URL FOTO DI BAWAH INI ── */
+      photo: "URL_FOTO_ARJUNA_DI_SINI",
       title: "Ksatria Madukara • Penengah Pandawa",
       category: "pandawa",
       isPremium: false,
